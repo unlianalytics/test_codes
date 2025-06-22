@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, BackgroundTasks
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -10,18 +10,24 @@ import PyPDF2
 import chromadb
 from sentence_transformers import SentenceTransformer
 import numpy as np
-from typing import List, Dict
+from typing import List, Dict, Set
 import re
 import glob
 import pandas as pd
 from datetime import datetime
 import warnings
+import hashlib
+import pickle
+import asyncio
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+import time
 warnings.filterwarnings('ignore')
 
 # Load environment variables
 load_dotenv()
 
-app = FastAPI(title="Texas AI Agent", description="A simple AI agent with Texas flag theme and RAG capabilities for RF Engineering")
+app = FastAPI(title="T-Mobile RF AI Agent", description="Optimized AI agent with T-Mobile branding and RAG capabilities for RF Engineering")
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -39,7 +45,7 @@ embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 
 # Initialize ChromaDB for vector storage
 chroma_client = chromadb.Client()
-collection_name = "texas_ai_knowledge"
+collection_name = "tmobile_rf_knowledge"
 try:
     knowledge_collection = chroma_client.get_collection(collection_name)
 except:
@@ -49,14 +55,75 @@ except:
 # File Discovery Configuration
 PDF_DIRECTORY = r"C:\Users\magno\Downloads\pdf_files"  # Directory containing PDFs
 CSV_DIRECTORY = r"C:\Users\magno\Downloads\csv_metrics"  # Directory containing CSV metrics
+CACHE_DIRECTORY = r"C:\Users\magno\Downloads\agent_cache"  # Cache directory for processed data
 AUTO_LOAD_PDFS = True  # Set to True for automatic PDF discovery
 AUTO_LOAD_CSVS = True  # Set to True for automatic CSV discovery
 
+# Performance Configuration
+MAX_WORKERS = 4          # Parallel workers (increase for more cores)
+BATCH_SIZE = 100         # Chunk batch size
+CHUNK_SIZE = 800         # Optimized chunk size
+ENABLE_CACHING = True    # Enable file processing cache
+ENABLE_INCREMENTAL = True # Enable incremental processing
+
 # ===== END CONFIGURATION =====
 
-# PDF processing function
-def process_pdf(pdf_path: str, source_name: str = "unknown") -> List[Dict]:
-    """Extract text from PDF and split into chunks"""
+# File tracking for incremental processing
+class FileTracker:
+    def __init__(self, cache_dir: str):
+        self.cache_dir = Path(cache_dir)
+        self.cache_dir.mkdir(exist_ok=True)
+        self.tracker_file = self.cache_dir / "file_tracker.pkl"
+        self.processed_files = self.load_tracker()
+    
+    def load_tracker(self) -> Dict[str, Dict]:
+        """Load processed files tracker"""
+        if self.tracker_file.exists():
+            try:
+                with open(self.tracker_file, 'rb') as f:
+                    return pickle.load(f)
+            except:
+                return {}
+        return {}
+    
+    def save_tracker(self):
+        """Save processed files tracker"""
+        with open(self.tracker_file, 'wb') as f:
+            pickle.dump(self.processed_files, f)
+    
+    def get_file_hash(self, file_path: str) -> str:
+        """Get file hash for change detection"""
+        try:
+            with open(file_path, 'rb') as f:
+                return hashlib.md5(f.read()).hexdigest()
+        except:
+            return ""
+    
+    def is_file_modified(self, file_path: str) -> bool:
+        """Check if file has been modified since last processing"""
+        file_hash = self.get_file_hash(file_path)
+        last_hash = self.processed_files.get(file_path, {}).get('hash', '')
+        return file_hash != last_hash
+    
+    def mark_file_processed(self, file_path: str, chunks_count: int):
+        """Mark file as processed"""
+        self.processed_files[file_path] = {
+            'hash': self.get_file_hash(file_path),
+            'processed_at': datetime.now().isoformat(),
+            'chunks_count': chunks_count
+        }
+        self.save_tracker()
+    
+    def get_unprocessed_files(self, file_paths: List[str]) -> List[str]:
+        """Get list of files that need processing"""
+        return [path for path in file_paths if self.is_file_modified(path)]
+
+# Initialize file tracker
+file_tracker = FileTracker(CACHE_DIRECTORY)
+
+# Optimized PDF processing function
+def process_pdf_optimized(pdf_path: str, source_name: str = "unknown") -> List[Dict]:
+    """Extract text from PDF with optimized chunking"""
     try:
         with open(pdf_path, 'rb') as file:
             pdf_reader = PyPDF2.PdfReader(file)
@@ -65,8 +132,8 @@ def process_pdf(pdf_path: str, source_name: str = "unknown") -> List[Dict]:
             for page_num, page in enumerate(pdf_reader.pages):
                 text = page.extract_text()
                 if text.strip():
-                    # Split text into smaller chunks (roughly 500 characters each)
-                    chunks = split_text_into_chunks(text, 500)
+                    # Use optimized chunk size
+                    chunks = split_text_into_chunks_optimized(text, CHUNK_SIZE)
                     for i, chunk in enumerate(chunks):
                         if chunk.strip():
                             text_chunks.append({
@@ -83,12 +150,12 @@ def process_pdf(pdf_path: str, source_name: str = "unknown") -> List[Dict]:
         print(f"Error processing PDF {pdf_path}: {e}")
         return []
 
-# CSV processing function for KPI metrics
-def process_csv(csv_path: str, source_name: str = "unknown") -> List[Dict]:
-    """Process CSV files and extract KPI metrics information"""
+# Optimized CSV processing function
+def process_csv_optimized(csv_path: str, source_name: str = "unknown") -> List[Dict]:
+    """Process CSV files with optimized analysis"""
     try:
-        # Read CSV file
-        df = pd.read_csv(csv_path)
+        # Read CSV file with optimized settings
+        df = pd.read_csv(csv_path, nrows=10000)  # Limit rows for large files
         
         # Get basic information about the dataset
         rows, cols = df.shape
@@ -104,11 +171,11 @@ def process_csv(csv_path: str, source_name: str = "unknown") -> List[Dict]:
         for col, dtype in df.dtypes.items():
             dtypes_info += f"  - {col}: {dtype}\n"
         
-        # Get basic statistics for numeric columns
+        # Get basic statistics for numeric columns (optimized)
         numeric_cols = df.select_dtypes(include=[np.number]).columns
         if len(numeric_cols) > 0:
             stats_info = "Numeric Column Statistics:\n"
-            for col in numeric_cols[:10]:  # Limit to first 10 numeric columns
+            for col in numeric_cols[:5]:  # Limit to first 5 numeric columns
                 stats = df[col].describe()
                 stats_info += f"  - {col}:\n"
                 stats_info += f"    Mean: {stats['mean']:.4f}\n"
@@ -118,9 +185,9 @@ def process_csv(csv_path: str, source_name: str = "unknown") -> List[Dict]:
         else:
             stats_info = "No numeric columns found for statistical analysis.\n"
         
-        # Get sample data (first few rows)
-        sample_data = "Sample Data (first 5 rows):\n"
-        sample_data += df.head().to_string(index=False)
+        # Get sample data (optimized)
+        sample_data = "Sample Data (first 3 rows):\n"
+        sample_data += df.head(3).to_string(index=False)
         
         # Create chunks from the information
         chunks = []
@@ -166,7 +233,7 @@ def process_csv(csv_path: str, source_name: str = "unknown") -> List[Dict]:
         })
         
         # Add specific KPI analysis if columns suggest network metrics
-        kpi_analysis = analyze_network_kpis(df, source_name)
+        kpi_analysis = analyze_network_kpis_optimized(df, source_name)
         if kpi_analysis:
             chunks.append({
                 'text': kpi_analysis,
@@ -183,8 +250,8 @@ def process_csv(csv_path: str, source_name: str = "unknown") -> List[Dict]:
         print(f"Error processing CSV {csv_path}: {e}")
         return []
 
-def analyze_network_kpis(df: pd.DataFrame, source_name: str) -> str:
-    """Analyze network KPI metrics from the dataset"""
+def analyze_network_kpis_optimized(df: pd.DataFrame, source_name: str) -> str:
+    """Analyze network KPI metrics with optimized processing"""
     try:
         analysis = f"Network KPI Analysis for {source_name}:\n\n"
         
@@ -212,7 +279,7 @@ def analyze_network_kpis(df: pd.DataFrame, source_name: str) -> str:
             
             if matching_cols:
                 analysis += f"{metric_type.replace('_', ' ').title()} Metrics:\n"
-                for col in matching_cols:
+                for col in matching_cols[:3]:  # Limit to first 3 matching columns
                     if col in df.select_dtypes(include=[np.number]).columns:
                         stats = df[col].describe()
                         analysis += f"  - {col}:\n"
@@ -224,100 +291,98 @@ def analyze_network_kpis(df: pd.DataFrame, source_name: str) -> str:
                         analysis += f"  - {col}: {unique_vals} unique values\n"
                 analysis += "\n"
         
-        # Check for time-based data
-        time_columns = [col for col in df.columns if any(time_word in col.lower() for time_word in ['time', 'date', 'timestamp'])]
-        if time_columns:
-            analysis += "Time-based Analysis:\n"
-            for col in time_columns:
-                try:
-                    df[col] = pd.to_datetime(df[col], errors='coerce')
-                    if df[col].notna().any():
-                        date_range = f"{df[col].min()} to {df[col].max()}"
-                        analysis += f"  - {col}: {date_range}\n"
-                except:
-                    pass
-            analysis += "\n"
-        
         return analysis
         
     except Exception as e:
         print(f"Error analyzing network KPIs: {e}")
         return ""
 
-def split_text_into_chunks(text: str, max_length: int) -> List[str]:
-    """Split text into chunks of approximately max_length characters"""
-    words = text.split()
+def split_text_into_chunks_optimized(text: str, max_length: int) -> List[str]:
+    """Split text into chunks with optimized algorithm"""
+    # Use sentence boundaries for better chunking
+    sentences = re.split(r'[.!?]+', text)
     chunks = []
-    current_chunk = []
-    current_length = 0
+    current_chunk = ""
     
-    for word in words:
-        if current_length + len(word) + 1 <= max_length:
-            current_chunk.append(word)
-            current_length += len(word) + 1
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+            
+        if len(current_chunk) + len(sentence) + 1 <= max_length:
+            current_chunk += sentence + ". "
         else:
             if current_chunk:
-                chunks.append(' '.join(current_chunk))
-            current_chunk = [word]
-            current_length = len(word)
+                chunks.append(current_chunk.strip())
+            current_chunk = sentence + ". "
     
     if current_chunk:
-        chunks.append(' '.join(current_chunk))
+        chunks.append(current_chunk.strip())
     
     return chunks
 
-def add_to_knowledge_base(chunks: List[Dict]):
-    """Add text chunks to the vector database"""
+def add_to_knowledge_base_batch(chunks: List[Dict]):
+    """Add text chunks to the vector database in batches"""
     try:
-        texts = [chunk['text'] for chunk in chunks]
-        metadatas = [
-            {
-                'chunk_id': chunk['chunk_id'],
-                'source': chunk['source'],
-                'file_path': chunk['file_path'],
-                'file_type': chunk.get('file_type', 'unknown'),
-                'data_type': chunk.get('data_type', 'general'),
-                'page': chunk.get('page', 0)
-            } for chunk in chunks
-        ]
-        ids = [chunk['chunk_id'] for chunk in chunks]
-        
-        # Generate embeddings
-        embeddings = embedding_model.encode(texts).tolist()
-        
-        # Add to collection
-        knowledge_collection.add(
-            embeddings=embeddings,
-            documents=texts,
-            metadatas=metadatas,
-            ids=ids
-        )
+        if not chunks:
+            return True
+            
+        # Process in batches
+        for i in range(0, len(chunks), BATCH_SIZE):
+            batch = chunks[i:i + BATCH_SIZE]
+            
+            texts = [chunk['text'] for chunk in batch]
+            metadatas = [
+                {
+                    'chunk_id': chunk['chunk_id'],
+                    'source': chunk['source'],
+                    'file_path': chunk['file_path'],
+                    'file_type': chunk.get('file_type', 'unknown'),
+                    'data_type': chunk.get('data_type', 'general'),
+                    'page': chunk.get('page', 0)
+                } for chunk in batch
+            ]
+            ids = [chunk['chunk_id'] for chunk in batch]
+            
+            # Generate embeddings in batch
+            embeddings = embedding_model.encode(texts).tolist()
+            
+            # Add to collection
+            knowledge_collection.add(
+                embeddings=embeddings,
+                documents=texts,
+                metadatas=metadatas,
+                ids=ids
+            )
         
         return True
     except Exception as e:
         print(f"Error adding to knowledge base: {e}")
         return False
 
-def search_knowledge_base(query: str, top_k: int = 5) -> List[Dict]:
-    """Search the knowledge base for relevant information"""
+def search_knowledge_base_optimized(query: str, top_k: int = 5) -> List[Dict]:
+    """Search the knowledge base with optimized retrieval"""
     try:
         # Generate query embedding
         query_embedding = embedding_model.encode([query]).tolist()
         
-        # Search collection
+        # Search collection with optimized parameters
         results = knowledge_collection.query(
             query_embeddings=query_embedding,
-            n_results=top_k
+            n_results=top_k,
+            include=['documents', 'metadatas', 'distances']
         )
         
-        # Return documents with metadata
+        # Return documents with metadata and relevance scores
         if results['documents'] and results['metadatas']:
             documents_with_metadata = []
             for i, doc in enumerate(results['documents'][0]):
                 metadata = results['metadatas'][0][i] if i < len(results['metadatas'][0]) else {}
+                distance = results['distances'][0][i] if i < len(results['distances'][0]) else 0
                 documents_with_metadata.append({
                     'text': doc,
-                    'metadata': metadata
+                    'metadata': metadata,
+                    'relevance_score': 1 - distance  # Convert distance to relevance score
                 })
             return documents_with_metadata
         return []
@@ -367,65 +432,129 @@ def get_csv_files_from_directory(directory: str) -> Dict[str, str]:
         print(f"Error scanning directory {directory}: {e}")
         return {}
 
-# Initialize knowledge base with PDFs and CSVs
+def process_file_parallel(file_path: str, file_type: str, source_name: str) -> List[Dict]:
+    """Process a single file (for parallel processing)"""
+    try:
+        if file_type == 'pdf':
+            return process_pdf_optimized(file_path, source_name)
+        elif file_type == 'csv':
+            return process_csv_optimized(file_path, source_name)
+        else:
+            return []
+    except Exception as e:
+        print(f"Error processing {file_type} file {file_path}: {e}")
+        return []
+
+# Initialize knowledge base with optimized processing
 def initialize_knowledge_base():
-    """Initialize the knowledge base with PDF and CSV files"""
+    """Initialize the knowledge base with optimized file processing"""
     all_chunks = []
     processed_files = []
     
+    start_time = time.time()
+    
     # Process PDF files
     if AUTO_LOAD_PDFS:
-        print(f"\nScanning directory for PDF files: {PDF_DIRECTORY}")
+        print(f"\n Scanning directory for PDF files: {PDF_DIRECTORY}")
         pdf_files = get_pdf_files_from_directory(PDF_DIRECTORY)
         
         if pdf_files:
-            print(f"Found {len(pdf_files)} PDF files:")
-            for source_name, pdf_path in pdf_files.items():
-                print(f"  - {source_name}: {pdf_path}")
+            print(f"Found {len(pdf_files)} PDF files")
             
-            for source_name, pdf_path in pdf_files.items():
-                print(f"\nProcessing PDF: {source_name}...")
-                chunks = process_pdf(pdf_path, source_name)
-                if chunks:
-                    all_chunks.extend(chunks)
-                    processed_files.append(f"PDF: {source_name}")
-                    print(f"  ✓ Added {len(chunks)} chunks from {source_name}")
-                else:
-                    print(f"  ✗ No chunks extracted from {source_name}")
+            # Get unprocessed files
+            if ENABLE_INCREMENTAL:
+                unprocessed_pdfs = file_tracker.get_unprocessed_files(list(pdf_files.values()))
+                print(f"Processing {len(unprocessed_pdfs)} new/modified PDF files")
+            else:
+                unprocessed_pdfs = list(pdf_files.values())
+            
+            # Process files in parallel
+            with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                future_to_file = {}
+                for source_name, pdf_path in pdf_files.items():
+                    if pdf_path in unprocessed_pdfs:
+                        future = executor.submit(process_file_parallel, pdf_path, 'pdf', source_name)
+                        future_to_file[future] = (source_name, pdf_path)
+                
+                for future in as_completed(future_to_file):
+                    source_name, pdf_path = future_to_file[future]
+                    try:
+                        chunks = future.result()
+                        if chunks:
+                            all_chunks.extend(chunks)
+                            processed_files.append(f"PDF: {source_name}")
+                            file_tracker.mark_file_processed(pdf_path, len(chunks))
+                            print(f"  ✓ Added {len(chunks)} chunks from {source_name}")
+                        else:
+                            print(f"  ✗ No chunks extracted from {source_name}")
+                    except Exception as e:
+                        print(f"  ✗ Error processing {source_name}: {e}")
         else:
             print(f"No PDF files found in {PDF_DIRECTORY}")
     
     # Process CSV files
     if AUTO_LOAD_CSVS:
-        print(f"\nScanning directory for CSV files: {CSV_DIRECTORY}")
+        print(f"\n Scanning directory for CSV files: {CSV_DIRECTORY}")
         csv_files = get_csv_files_from_directory(CSV_DIRECTORY)
         
         if csv_files:
-            print(f"Found {len(csv_files)} CSV files:")
-            for source_name, csv_path in csv_files.items():
-                print(f"  - {source_name}: {csv_path}")
+            print(f"Found {len(csv_files)} CSV files")
             
-            for source_name, csv_path in csv_files.items():
-                print(f"\nProcessing CSV: {source_name}...")
-                chunks = process_csv(csv_path, source_name)
-                if chunks:
-                    all_chunks.extend(chunks)
-                    processed_files.append(f"CSV: {source_name}")
-                    print(f"  ✓ Added {len(chunks)} chunks from {source_name}")
-                else:
-                    print(f"  ✗ No chunks extracted from {source_name}")
+            # Get unprocessed files
+            if ENABLE_INCREMENTAL:
+                unprocessed_csvs = file_tracker.get_unprocessed_files(list(csv_files.values()))
+                print(f"Processing {len(unprocessed_csvs)} new/modified CSV files")
+            else:
+                unprocessed_csvs = list(csv_files.values())
+            
+            # Process files in parallel
+            with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                future_to_file = {}
+                for source_name, csv_path in csv_files.items():
+                    if csv_path in unprocessed_csvs:
+                        future = executor.submit(process_file_parallel, csv_path, 'csv', source_name)
+                        future_to_file[future] = (source_name, csv_path)
+                
+                for future in as_completed(future_to_file):
+                    source_name, csv_path = future_to_file[future]
+                    try:
+                        chunks = future.result()
+                        if chunks:
+                            all_chunks.extend(chunks)
+                            processed_files.append(f"CSV: {source_name}")
+                            file_tracker.mark_file_processed(csv_path, len(chunks))
+                            print(f"  ✓ Added {len(chunks)} chunks from {source_name}")
+                        else:
+                            print(f"  ✗ No chunks extracted from {source_name}")
+                    except Exception as e:
+                        print(f"  ✗ Error processing {source_name}: {e}")
         else:
             print(f"No CSV files found in {CSV_DIRECTORY}")
     
     if all_chunks:
-        success = add_to_knowledge_base(all_chunks)
+        success = add_to_knowledge_base_batch(all_chunks)
         if success:
-            print(f"\nSuccessfully added {len(all_chunks)} total chunks to knowledge base")
-            print(f"Processed files: {', '.join(processed_files)}")
+            end_time = time.time()
+            processing_time = end_time - start_time
+            print(f"\n Successfully added {len(all_chunks)} total chunks to knowledge base")
+            print(f" Processed files: {', '.join(processed_files)}")
+            print(f"⏱️ Processing time: {processing_time:.2f} seconds")
         else:
             print("\n❌ Failed to add chunks to knowledge base")
     else:
-        print("\n❌ No text chunks extracted from any files")
+        print("\n✅ No new files to process (all files are up to date)")
+
+# Background task for processing files
+async def process_files_background():
+    """Background task for processing files"""
+    while True:
+        try:
+            initialize_knowledge_base()
+            # Wait for 5 minutes before checking for new files
+            await asyncio.sleep(300)
+        except Exception as e:
+            print(f"Error in background processing: {e}")
+            await asyncio.sleep(60)
 
 # Initialize knowledge base on startup
 initialize_knowledge_base()
@@ -437,10 +566,10 @@ async def home(request: Request):
 
 @app.post("/chat")
 async def chat(message: str = Form(...)):
-    """Handle chat messages with Claude using RAG"""
+    """Handle chat messages with Claude using optimized RAG"""
     try:
         # Search knowledge base for relevant information
-        relevant_docs = search_knowledge_base(message)
+        relevant_docs = search_knowledge_base_optimized(message)
         
         # Create context from relevant documents
         context = ""
@@ -452,7 +581,7 @@ async def chat(message: str = Form(...)):
                     source_info += f", Type: {doc['metadata'].get('data_type', 'data')}"
                 elif doc['metadata'].get('file_type') == 'pdf':
                     source_info += f", Page: {doc['metadata'].get('page', 'unknown')}"
-                source_info += "]"
+                source_info += f", Relevance: {doc.get('relevance_score', 0):.2f}]"
                 context_parts.append(f"{doc['text']}\n{source_info}")
             
             context = "\n\n".join(context_parts)
@@ -493,7 +622,7 @@ async def chat(message: str = Form(...)):
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {"status": "healthy", "message": "Texas AI Agent with RAG for RF Engineering is running!"}
+    return {"status": "healthy", "message": "Optimized Texas AI Agent with RAG for RF Engineering is running!"}
 
 @app.get("/knowledge-status")
 async def knowledge_status():
@@ -537,8 +666,13 @@ async def get_file_sources():
         sources_info = {
             "pdf_directory": PDF_DIRECTORY if AUTO_LOAD_PDFS else None,
             "csv_directory": CSV_DIRECTORY if AUTO_LOAD_CSVS else None,
+            "cache_directory": CACHE_DIRECTORY,
             "auto_load_pdfs": AUTO_LOAD_PDFS,
-            "auto_load_csvs": AUTO_LOAD_CSVS
+            "auto_load_csvs": AUTO_LOAD_CSVS,
+            "enable_caching": ENABLE_CACHING,
+            "enable_incremental": ENABLE_INCREMENTAL,
+            "max_workers": MAX_WORKERS,
+            "batch_size": BATCH_SIZE
         }
         
         if AUTO_LOAD_PDFS:
@@ -556,6 +690,21 @@ async def get_file_sources():
         return {
             "status": "error",
             "message": f"Error getting file sources: {str(e)}"
+        }
+
+@app.post("/refresh-knowledge-base")
+async def refresh_knowledge_base(background_tasks: BackgroundTasks):
+    """Manually refresh the knowledge base"""
+    try:
+        background_tasks.add_task(initialize_knowledge_base)
+        return {
+            "status": "success",
+            "message": "Knowledge base refresh started in background"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Error refreshing knowledge base: {str(e)}"
         }
 
 if __name__ == "__main__":

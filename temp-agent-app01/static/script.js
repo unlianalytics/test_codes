@@ -1,3 +1,44 @@
+// Customer Support Modal Functions - Move these to global scope
+function openSupportModal() {
+    console.log('openSupportModal called');
+    const modal = document.getElementById('supportModal');
+    console.log('Modal element:', modal);
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        console.log('Modal should be visible now');
+    } else {
+        console.error('Modal element not found!');
+    }
+}
+
+function closeSupportModal() {
+    console.log('closeSupportModal called');
+    const modal = document.getElementById('supportModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restore scrolling
+        console.log('Modal should be hidden now');
+    } else {
+        console.error('Modal element not found!');
+    }
+}
+
+// Close modal when clicking outside of it
+function handleModalClick(event) {
+    const modal = document.getElementById('supportModal');
+    if (event.target === modal) {
+        closeSupportModal();
+    }
+}
+
+// Close modal with Escape key
+function handleKeyDown(event) {
+    if (event.key === 'Escape') {
+        closeSupportModal();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const chatForm = document.getElementById('chatForm');
     const messageInput = document.getElementById('messageInput');
@@ -186,4 +227,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
         }
     });
+
+    // Add event listeners for modal functionality
+    window.addEventListener('click', handleModalClick);
+    document.addEventListener('keydown', handleKeyDown);
 }); 

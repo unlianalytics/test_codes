@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Hub - T-Mobile Multi-App Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/maintenance.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="tmobile-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='/tmo_logo.png') }}" alt="T-Mobile Logo" class="logo-image">
+                </div>
+            </div>
+            <div class="header-navigation">
+                <a href="/" class="back-button">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Back to Apps</span>
+                </a>
+            </div>
+            <h1>Documentation Hub</h1>
+            <p class="subtitle">Centralized repository for T-Mobile engineering documentation and resources</p>
+        </header>
+
+        <main class="maintenance-container">
+            <div class="maintenance-card">
+                <div class="maintenance-icon">📚</div>
+                <h2>Under Maintenance</h2>
+                <p class="maintenance-message">
+                    We're building a comprehensive documentation hub with advanced search capabilities, 
+                    version control, and collaborative features for T-Mobile engineering resources.
+                </p>
+                
+                <div class="features-preview">
+                    <h3>Coming Features:</h3>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <span class="feature-icon">🔍</span>
+                            <span class="feature-text">Advanced Search</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📋</span>
+                            <span class="feature-text">Version Control</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">👥</span>
+                            <span class="feature-text">Collaboration Tools</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">📖</span>
+                            <span class="feature-text">Knowledge Base</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 20%"></div>
+                    </div>
+                    <p class="progress-text">Development Progress: 20%</p>
+                </div>
+
+                <div class="estimated-launch">
+                    <p>Estimated Launch: <strong>Q4 2025</strong></p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by T-Mobile Engineering • Documentation Hub • Coming Soon</p>
+        </footer>
+    </div>
+</body>
+</html> 

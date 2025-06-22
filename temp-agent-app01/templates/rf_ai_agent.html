@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Mobile RF AI Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="tmobile-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='/tmo_logo.png') }}" alt="T-Mobile Logo" class="logo-image">
+                </div>
+            </div>
+            <div class="header-navigation">
+                <a href="/" class="back-button">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Back to Apps</span>
+                </a>
+            </div>
+            <h1>T-Mobile RF AI Agent</h1>
+            <p class="subtitle">Hello! I'm your friendly RF AI assistant with T-Mobile expertise,</p>
+            <p class="subtitle">ready to help you optimize network performance and analyze KPI metrics!</p>
+            <div class="rag-badge">
+                <span class="badge-icon">📚</span>
+                <span class="badge-text">RAG Enhanced</span>
+            </div>
+        </header>
+
+        <main class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <div class="bot-avatar">📱</div>
+                        <div class="message-text">
+                            Hello! I'm your T-Mobile RF AI assistant with enhanced knowledge capabilities. I can help you with general questions and also provide detailed information from my knowledge base. What can I do for you today?
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <form id="chatForm" class="chat-form">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            name="message" 
+                            placeholder="Ask me anything! I've got enhanced knowledge..." 
+                            required
+                            autocomplete="off"
+                        >
+                        <button type="submit" id="sendButton">
+                            <span class="button-text">Send</span>
+                            <span class="button-icon">📱</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by Claude AI • T-Mobile RF Engineering • Enhanced with RAG</p>
+            <div class="knowledge-status" id="knowledgeStatus">
+                <span class="status-icon">📖</span>
+                <span class="status-text">Loading knowledge base...</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', path='/script.js') }}"></script>
+</body>
+</html> 

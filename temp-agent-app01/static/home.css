@@ -1,0 +1,527 @@
+/* T-Mobile Colors */
+:root {
+    --tmobile-magenta: #E20074;
+    --tmobile-purple: #5D2E8C;
+    --tmobile-dark: #1A1A1A;
+    --tmobile-light: #F8F9FA;
+    --tmobile-gray: #6C757D;
+    --tmobile-white: #FFFFFF;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, var(--tmobile-light) 0%, var(--tmobile-white) 100%);
+    min-height: 100vh;
+    color: var(--tmobile-dark);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px;
+    background: var(--tmobile-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 2px solid var(--tmobile-magenta);
+}
+
+.tmobile-logo {
+    margin-bottom: 20px;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.logo-image {
+    max-height: 80px;
+    width: auto;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    transition: var(--transition);
+}
+
+.logo-image:hover {
+    transform: scale(1.05);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
+}
+
+.header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    color: var(--tmobile-magenta);
+    margin: 15px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--tmobile-purple);
+    font-weight: 300;
+    margin-bottom: 10px;
+}
+
+/* Apps Container */
+.apps-container {
+    flex: 1;
+    padding: 20px 0;
+}
+
+.apps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+/* App Cards */
+.app-card {
+    background: var(--tmobile-white);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    box-shadow: var(--shadow);
+    border: 2px solid transparent;
+    transition: var(--transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.app-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--tmobile-magenta);
+}
+
+.app-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.app-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--tmobile-magenta);
+    margin-bottom: 10px;
+}
+
+.app-card p {
+    color: var(--tmobile-gray);
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* App Features */
+.app-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.feature-tag {
+    background: linear-gradient(135deg, var(--tmobile-purple) 0%, #4A1F6B 100%);
+    color: var(--tmobile-white);
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* App Status */
+.app-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.active {
+    background: #28a745;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.coming-soon {
+    background: #FFA500; /* Orange for "Under Development" */
+    animation: pulse 2s infinite;
+}
+
+.status-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--tmobile-gray);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    color: var(--tmobile-purple);
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.platform-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: rgba(40, 167, 69, 0.1);
+    border-radius: 20px;
+    border: 1px solid #28a745;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-icon {
+    font-size: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .apps-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .app-card {
+        padding: 20px;
+    }
+    
+    .logo-image {
+        max-height: 60px;
+    }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--tmobile-light);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--tmobile-magenta);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #B8005E;
+}
+
+/* Customer Support Floating Button */
+.support-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--tmobile-magenta) 0%, #B8005E 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(226, 0, 116, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: 3px solid var(--tmobile-white);
+}
+
+.support-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(226, 0, 116, 0.4);
+}
+
+.support-icon {
+    font-size: 1.8rem;
+    color: var(--tmobile-white);
+}
+
+.support-tooltip {
+    position: absolute;
+    right: 70px;
+    background: var(--tmobile-dark);
+    color: var(--tmobile-white);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.support-tooltip::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-left: 5px solid var(--tmobile-dark);
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+}
+
+.support-button:hover .support-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Customer Support Modal */
+.support-modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.support-modal-content {
+    background: var(--tmobile-white);
+    margin: 5% auto;
+    padding: 0;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+    border: 2px solid var(--tmobile-magenta);
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.support-modal-header {
+    background: linear-gradient(135deg, var(--tmobile-magenta) 0%, var(--tmobile-purple) 100%);
+    color: var(--tmobile-white);
+    padding: 20px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.support-modal-header h2 {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+}
+
+.close-button {
+    color: var(--tmobile-white);
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    line-height: 1;
+}
+
+.close-button:hover {
+    transform: scale(1.2);
+    color: #FFD700;
+}
+
+.support-modal-body {
+    padding: 25px;
+}
+
+.support-team-info {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.team-section, .contact-section, .hours-section, .response-info {
+    padding: 15px;
+    background: var(--tmobile-light);
+    border-radius: 8px;
+    border-left: 4px solid var(--tmobile-magenta);
+}
+
+.team-section h3, .contact-section h3, .hours-section h3, .response-info h3 {
+    margin: 0 0 10px 0;
+    color: var(--tmobile-purple);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.team-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--tmobile-magenta);
+    margin: 0;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.contact-label {
+    font-weight: 600;
+    color: var(--tmobile-dark);
+    min-width: 60px;
+}
+
+.contact-value {
+    color: var(--tmobile-magenta);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.contact-value:hover {
+    color: var(--tmobile-purple);
+    text-decoration: underline;
+}
+
+.hours-info {
+    margin: 0;
+}
+
+.hours-info p {
+    margin: 5px 0;
+    color: var(--tmobile-dark);
+}
+
+.timezone {
+    font-size: 0.9rem;
+    color: var(--tmobile-gray);
+    font-style: italic;
+}
+
+.response-info p {
+    margin: 0;
+    color: var(--tmobile-dark);
+    line-height: 1.5;
+}
+
+.support-modal-footer {
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid var(--tmobile-light);
+}
+
+.support-close-btn {
+    background: linear-gradient(135deg, var(--tmobile-purple) 0%, #4A1F6B 100%);
+    color: var(--tmobile-white);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.support-close-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(93, 46, 140, 0.3);
+}
+
+/* Responsive Design for Support Modal */
+@media (max-width: 768px) {
+    .support-button {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .support-icon {
+        font-size: 1.5rem;
+    }
+    
+    .support-tooltip {
+        display: none;
+    }
+    
+    .support-modal-content {
+        margin: 10% auto;
+        width: 95%;
+    }
+    
+    .support-modal-body {
+        padding: 20px;
+    }
+    
+    .team-section, .contact-section, .hours-section, .response-info {
+        padding: 12px;
+    }
+} 

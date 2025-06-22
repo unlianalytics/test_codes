@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Troubleshooting Guide - T-Mobile Multi-App Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/maintenance.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="tmobile-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='/tmo_logo.png') }}" alt="T-Mobile Logo" class="logo-image">
+                </div>
+            </div>
+            <div class="header-navigation">
+                <a href="/" class="back-button">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Back to Apps</span>
+                </a>
+            </div>
+            <h1>Troubleshooting Guide</h1>
+            <p class="subtitle">Interactive troubleshooting guides and diagnostic tools for network issues</p>
+        </header>
+
+        <main class="maintenance-container">
+            <div class="maintenance-card">
+                <div class="maintenance-icon">🔧</div>
+                <h2>Under Maintenance</h2>
+                <p class="maintenance-message">
+                    We're creating an interactive troubleshooting guide with step-by-step diagnostics, 
+                    automated problem detection, and comprehensive solution databases.
+                </p>
+                
+                <div class="features-preview">
+                    <h3>Coming Features:</h3>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <span class="feature-icon">📝</span>
+                            <span class="feature-text">Step-by-step Guides</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🔍</span>
+                            <span class="feature-text">Automated Diagnostics</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">💡</span>
+                            <span class="feature-text">Solution Database</span>
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">🎯</span>
+                            <span class="feature-text">Problem Detection</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-section">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 30%"></div>
+                    </div>
+                    <p class="progress-text">Development Progress: 30%</p>
+                </div>
+
+                <div class="estimated-launch">
+                    <p>Estimated Launch: <strong>Q1 2026</strong></p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by T-Mobile Engineering • Troubleshooting Guide • Coming Soon</p>
+        </footer>
+    </div>
+</body>
+</html> 

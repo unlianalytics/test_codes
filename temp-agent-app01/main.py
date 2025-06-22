@@ -561,8 +561,13 @@ initialize_knowledge_base()
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """Home page with Texas-themed chat interface"""
-    return templates.TemplateResponse("index.html", {"request": request})
+    """Main landing page with app selection"""
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/rf-ai-agent", response_class=HTMLResponse)
+async def rf_ai_agent(request: Request):
+    """RF AI Agent page"""
+    return templates.TemplateResponse("rf_ai_agent.html", {"request": request})
 
 @app.post("/chat")
 async def chat(message: str = Form(...)):
@@ -706,6 +711,31 @@ async def refresh_knowledge_base(background_tasks: BackgroundTasks):
             "status": "error",
             "message": f"Error refreshing knowledge base: {str(e)}"
         }
+
+@app.get("/network-analyzer", response_class=HTMLResponse)
+async def network_analyzer(request: Request):
+    """Network Analyzer maintenance page"""
+    return templates.TemplateResponse("network_analyzer.html", {"request": request})
+
+@app.get("/coverage-planner", response_class=HTMLResponse)
+async def coverage_planner(request: Request):
+    """Coverage Planner maintenance page"""
+    return templates.TemplateResponse("coverage_planner.html", {"request": request})
+
+@app.get("/kpi-dashboard", response_class=HTMLResponse)
+async def kpi_dashboard(request: Request):
+    """KPI Dashboard maintenance page"""
+    return templates.TemplateResponse("kpi_dashboard.html", {"request": request})
+
+@app.get("/troubleshooting-guide", response_class=HTMLResponse)
+async def troubleshooting_guide(request: Request):
+    """Troubleshooting Guide maintenance page"""
+    return templates.TemplateResponse("troubleshooting_guide.html", {"request": request})
+
+@app.get("/documentation-hub", response_class=HTMLResponse)
+async def documentation_hub(request: Request):
+    """Documentation Hub maintenance page"""
+    return templates.TemplateResponse("documentation_hub.html", {"request": request})
 
 if __name__ == "__main__":
     import uvicorn

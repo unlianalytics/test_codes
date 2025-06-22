@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texas AI Agent</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="texas-flag">
+                <div class="flag-stripe red"></div>
+                <div class="flag-stripe white">
+                    <div class="star">★</div>
+                </div>
+                <div class="flag-stripe blue"></div>
+            </div>
+            <h1>Texas-RF AI Agent</h1>
+            <p class="subtitle">Howdy, y’all! I'm your friendly RF - AI assistant with that good ol’ Texas grit,</p>
+            <p class="subtitle">Aggie pride, and Owl wisdom—ready to help you hustle smarter, the Houston way!</p>
+        </header>
+
+        <main class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <div class="bot-avatar">🤠</div>
+                        <div class="message-text">
+                            Howdy partner! I'm your Texas AI assistant, ready to help you with anything you need. What can I do for you today?
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <form id="chatForm" class="chat-form">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="messageInput" 
+                            name="message" 
+                            placeholder="Type your message here, partner..." 
+                            required
+                            autocomplete="off"
+                        >
+                        <button type="submit" id="sendButton">
+                            <span class="button-text">Send</span>
+                            <span class="button-icon">🤠</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by Claude AI • Houston RF Engineering</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', path='/script.js') }}"></script>
+</body>
+</html> 

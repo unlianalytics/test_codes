@@ -1,0 +1,415 @@
+/* Texas Flag Colors */
+:root {
+    --texas-red: #D00C33;
+    --texas-blue: #002868;
+    --texas-white: #FFFFFF;
+    --texas-gray: #F5F5F5;
+    --texas-dark: #1A1A1A;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, var(--texas-gray) 0%, var(--texas-white) 100%);
+    min-height: 100vh;
+    color: var(--texas-dark);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Styles */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: var(--texas-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 2px solid var(--texas-red);
+    position: relative;
+}
+
+.header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    color: var(--texas-red);
+    margin: 10px 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--texas-blue);
+    font-weight: 300;
+    margin-bottom: 15px;
+}
+
+/* RAG Badge */
+.rag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--texas-blue) 0%, #001f4a 100%);
+    color: var(--texas-white);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--texas-red);
+    animation: badgeGlow 2s ease-in-out infinite;
+}
+
+.badge-icon {
+    font-size: 1.1rem;
+}
+
+.badge-text {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+@keyframes badgeGlow {
+    0%, 100% { box-shadow: var(--shadow); }
+    50% { box-shadow: 0 0 15px rgba(0, 40, 104, 0.3); }
+}
+
+/* Texas Flag Animation */
+.texas-flag {
+    width: 120px;
+    height: 80px;
+    margin: 0 auto 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    position: relative;
+    animation: flagWave 3s ease-in-out infinite;
+}
+
+.flag-stripe {
+    height: 33.33%;
+    position: relative;
+}
+
+.flag-stripe.red {
+    background: var(--texas-red);
+}
+
+.flag-stripe.white {
+    background: var(--texas-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flag-stripe.blue {
+    background: var(--texas-blue);
+}
+
+.star {
+    color: var(--texas-blue);
+    font-size: 1.5rem;
+    animation: starTwinkle 2s ease-in-out infinite;
+}
+
+@keyframes flagWave {
+    0%, 100% { transform: rotateY(0deg); }
+    50% { transform: rotateY(5deg); }
+}
+
+@keyframes starTwinkle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* Chat Container */
+.chat-container {
+    flex: 1;
+    background: var(--texas-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 2px solid var(--texas-blue);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+.message {
+    margin-bottom: 20px;
+    animation: messageSlide 0.3s ease-out;
+}
+
+.message-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.bot-avatar {
+    font-size: 2rem;
+    background: var(--texas-red);
+    color: var(--texas-white);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+}
+
+.user-avatar {
+    font-size: 1.5rem;
+    background: var(--texas-blue);
+    color: var(--texas-white);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: var(--shadow);
+}
+
+.message-text {
+    background: var(--texas-gray);
+    padding: 15px 20px;
+    border-radius: 18px;
+    max-width: 80%;
+    line-height: 1.5;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--texas-red);
+}
+
+.user-message .message-text {
+    background: var(--texas-blue);
+    color: var(--texas-white);
+    border-left: 4px solid var(--texas-red);
+}
+
+@keyframes messageSlide {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input Container */
+.chat-input-container {
+    padding: 20px;
+    background: var(--texas-gray);
+    border-top: 2px solid var(--texas-blue);
+}
+
+.chat-form {
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+#messageInput {
+    flex: 1;
+    padding: 15px 20px;
+    border: 2px solid var(--texas-blue);
+    border-radius: 25px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    background: var(--texas-white);
+}
+
+#messageInput:focus {
+    border-color: var(--texas-red);
+    box-shadow: 0 0 0 3px rgba(208, 12, 51, 0.1);
+}
+
+#sendButton {
+    background: linear-gradient(135deg, var(--texas-red) 0%, #B00A2E 100%);
+    color: var(--texas-white);
+    border: none;
+    padding: 15px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow);
+}
+
+#sendButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(208, 12, 51, 0.3);
+}
+
+#sendButton:active {
+    transform: translateY(0);
+}
+
+.button-icon {
+    font-size: 1.2rem;
+}
+
+/* Loading Animation */
+.loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--texas-blue);
+    font-style: italic;
+}
+
+.loading-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    background: var(--texas-red);
+    border-radius: 50%;
+    animation: loadingBounce 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes loadingBounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px;
+    color: var(--texas-blue);
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Knowledge Status */
+.knowledge-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: var(--texas-gray);
+    border-radius: 20px;
+    border: 1px solid var(--texas-blue);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-icon {
+    font-size: 1rem;
+}
+
+.status-text {
+    color: var(--texas-blue);
+}
+
+.knowledge-status.loaded {
+    background: rgba(0, 40, 104, 0.1);
+    border-color: var(--texas-blue);
+}
+
+.knowledge-status.error {
+    background: rgba(208, 12, 51, 0.1);
+    border-color: var(--texas-red);
+    color: var(--texas-red);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .texas-flag {
+        width: 100px;
+        height: 66px;
+    }
+    
+    .message-text {
+        max-width: 90%;
+    }
+    
+    .input-group {
+        flex-direction: column;
+    }
+    
+    #sendButton {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .rag-badge {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+
+/* Scrollbar Styling */
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: var(--texas-gray);
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: var(--texas-red);
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #B00A2E;
+} 

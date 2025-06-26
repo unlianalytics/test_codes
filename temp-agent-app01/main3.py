@@ -1,0 +1,968 @@
+# main3.py - Enhanced RAG Implementation for T-Mobile RF AI Agent
+# This version focuses on improved RAG performance and better knowledge base utilization
+
+from fastapi import FastAPI, Request, Form, BackgroundTasks
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+import json
+import PyPDF2
+import chromadb
+import numpy as np
+from typing import List, Dict, Set, Optional
+import re
+import glob
+import pandas as pd
+from datetime import datetime
+import warnings
+import hashlib
+import pickle
+import asyncio
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from pathlib import Path
+import time
+import logging
+warnings.filterwarnings('ignore')
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Load environment variables
+load_dotenv()
+
+app = FastAPI(title="T-Mobile RF AI Agent (Enhanced RAG)", description="Enhanced AI agent with improved RAG capabilities for RF Engineering")
+
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Templates
+templates = Jinja2Templates(directory="templates")
+
+# Initialize OpenAI client (OpenAI > 1.0 syntax)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "your-openai-api-key-here"))
+
+# OpenAI embedding model configuration
+EMBEDDING_MODEL = "text-embedding-ada-002"  # OpenAI's embedding model
+
+# Function to generate embeddings using OpenAI
+def generate_embeddings(texts: List[str]) -> List[List[float]]:
+    """Generate embeddings using OpenAI's embedding model with enhanced error handling"""
+    try:
+        if isinstance(texts, str):
+            texts = [texts]
+        
+        # Clean and prepare texts
+        cleaned_texts = []
+        for text in texts:
+            # Truncate text if it's too long (OpenAI has a limit)
+            if len(text) > 8000:  # OpenAI's limit is 8192 tokens, but we'll be conservative
+                text = text[:8000]
+            cleaned_texts.append(text)
+        
+        # Generate embeddings
+        response = client.embeddings.create(
+            model=EMBEDDING_MODEL,
+            input=cleaned_texts
+        )
+        
+        # Extract embeddings
+        embeddings = [data.embedding for data in response.data]
+        return embeddings
+    except Exception as e:
+        logger.error(f"Error generating embeddings: {e}")
+        return []
+
+# Initialize ChromaDB for vector storage
+chroma_client = chromadb.Client()
+collection_name = "tmobile_rf_knowledge_enhanced"
+try:
+    knowledge_collection = chroma_client.get_collection(collection_name)
+    logger.info(f"Using existing collection: {collection_name}")
+except:
+    knowledge_collection = chroma_client.create_collection(collection_name)
+    logger.info(f"Created new collection: {collection_name}")
+
+# ===== ENHANCED CONFIGURATION SECTION =====
+# File Discovery Configuration
+PDF_DIRECTORY = r"C:\Users\magno\Downloads\pdf_files"  # Directory containing PDFs
+CSV_DIRECTORY = r"C:\Users\magno\Downloads\csv_metrics"  # Directory containing CSV metrics
+CACHE_DIRECTORY = r"C:\Users\magno\Downloads\agent_cache"  # Cache directory for processed data
+AUTO_LOAD_PDFS = True  # Set to True for automatic PDF discovery
+AUTO_LOAD_CSVS = True  # Set to True for automatic CSV discovery
+
+# Enhanced Performance Configuration
+MAX_WORKERS = 4          # Parallel workers (increase for more cores)
+BATCH_SIZE = 50          # Reduced batch size for better embedding quality
+CHUNK_SIZE = 1000        # Increased chunk size for better context
+CHUNK_OVERLAP = 200      # Overlap between chunks for better continuity
+ENABLE_CACHING = True    # Enable file processing cache
+ENABLE_INCREMENTAL = True # Enable incremental processing
+
+# RAG Enhancement Configuration
+MIN_RELEVANCE_SCORE = 0.6  # Minimum relevance score for documents
+MAX_CONTEXT_LENGTH = 4000  # Maximum context length for LLM
+ENABLE_HYBRID_SEARCH = True  # Enable hybrid search (semantic + keyword)
+ENABLE_RERANKING = True   # Enable result reranking
+
+# ===== END CONFIGURATION =====
+
+# Enhanced file tracking for incremental processing
+class EnhancedFileTracker:
+    def __init__(self, cache_dir: str):
+        self.cache_dir = Path(cache_dir)
+        self.cache_dir.mkdir(exist_ok=True)
+        self.tracker_file = self.cache_dir / "enhanced_file_tracker.pkl"
+        self.processed_files = self.load_tracker()
+    
+    def load_tracker(self) -> Dict[str, Dict]:
+        """Load processed files tracker"""
+        if self.tracker_file.exists():
+            try:
+                with open(self.tracker_file, 'rb') as f:
+                    return pickle.load(f)
+            except:
+                return {}
+        return {}
+    
+    def save_tracker(self):
+        """Save processed files tracker"""
+        with open(self.tracker_file, 'wb') as f:
+            pickle.dump(self.processed_files, f)
+    
+    def get_file_hash(self, file_path: str) -> str:
+        """Get file hash for change detection"""
+        try:
+            with open(file_path, 'rb') as f:
+                return hashlib.md5(f.read()).hexdigest()
+        except:
+            return ""
+    
+    def is_file_modified(self, file_path: str) -> bool:
+        """Check if file has been modified since last processing"""
+        file_hash = self.get_file_hash(file_path)
+        last_hash = self.processed_files.get(file_path, {}).get('hash', '')
+        return file_hash != last_hash
+    
+    def mark_file_processed(self, file_path: str, chunks_count: int):
+        """Mark file as processed"""
+        self.processed_files[file_path] = {
+            'hash': self.get_file_hash(file_path),
+            'processed_at': datetime.now().isoformat(),
+            'chunks_count': chunks_count
+        }
+        self.save_tracker()
+    
+    def get_unprocessed_files(self, file_paths: List[str]) -> List[str]:
+        """Get list of files that need processing"""
+        return [path for path in file_paths if self.is_file_modified(path)]
+
+# Initialize enhanced file tracker
+file_tracker = EnhancedFileTracker(CACHE_DIRECTORY)
+
+# Enhanced PDF processing function with better chunking
+def process_pdf_enhanced(pdf_path: str, source_name: str = "unknown") -> List[Dict]:
+    """Extract text from PDF with enhanced chunking strategy"""
+    try:
+        with open(pdf_path, 'rb') as file:
+            pdf_reader = PyPDF2.PdfReader(file)
+            text_chunks = []
+            
+            logger.info(f"Processing PDF: {source_name} ({len(pdf_reader.pages)} pages)")
+            
+            for page_num, page in enumerate(pdf_reader.pages):
+                text = page.extract_text()
+                if text.strip():
+                    # Use enhanced chunking with overlap
+                    chunks = split_text_into_chunks_enhanced(text, CHUNK_SIZE, CHUNK_OVERLAP)
+                    for i, chunk in enumerate(chunks):
+                        if chunk.strip():
+                            text_chunks.append({
+                                'text': chunk.strip(),
+                                'page': page_num + 1,
+                                'chunk_id': f"{source_name}_page_{page_num + 1}_chunk_{i + 1}",
+                                'source': source_name,
+                                'file_path': pdf_path,
+                                'file_type': 'pdf',
+                                'chunk_index': i,
+                                'total_chunks': len(chunks)
+                            })
+            
+            logger.info(f"Extracted {len(text_chunks)} chunks from {source_name}")
+            return text_chunks
+    except Exception as e:
+        logger.error(f"Error processing PDF {pdf_path}: {e}")
+        return []
+
+# Enhanced CSV processing function
+def process_csv_enhanced(csv_path: str, source_name: str = "unknown") -> List[Dict]:
+    """Process CSV files with enhanced analysis"""
+    try:
+        # Read CSV file with optimized settings
+        df = pd.read_csv(csv_path, nrows=10000)  # Limit rows for large files
+        
+        # Get basic information about the dataset
+        rows, cols = df.shape
+        columns = list(df.columns)
+        
+        # Create enhanced summary information
+        summary_info = f"Dataset: {source_name}\n"
+        summary_info += f"Dimensions: {rows} rows × {cols} columns\n"
+        summary_info += f"Columns: {', '.join(columns)}\n"
+        
+        # Get data types
+        dtypes_info = "Data Types:\n"
+        for col, dtype in df.dtypes.items():
+            dtypes_info += f"  - {col}: {dtype}\n"
+        
+        # Get enhanced statistics for numeric columns
+        numeric_cols = df.select_dtypes(include=[np.number]).columns
+        if len(numeric_cols) > 0:
+            stats_info = "Numeric Column Statistics:\n"
+            for col in numeric_cols[:10]:  # Increased to 10 columns
+                stats = df[col].describe()
+                stats_info += f"  - {col}:\n"
+                stats_info += f"    Mean: {stats['mean']:.4f}\n"
+                stats_info += f"    Std: {stats['std']:.4f}\n"
+                stats_info += f"    Min: {stats['min']:.4f}\n"
+                stats_info += f"    Max: {stats['max']:.4f}\n"
+                stats_info += f"    Median: {stats['50%']:.4f}\n"
+        else:
+            stats_info = "No numeric columns found for statistical analysis.\n"
+        
+        # Get sample data
+        sample_data = "Sample Data (first 5 rows):\n"
+        sample_data += df.head(5).to_string(index=False)
+        
+        # Create chunks from the information
+        chunks = []
+        
+        # Summary chunk
+        chunks.append({
+            'text': summary_info,
+            'chunk_id': f"{source_name}_summary",
+            'source': source_name,
+            'file_path': csv_path,
+            'file_type': 'csv',
+            'data_type': 'summary'
+        })
+        
+        # Data types chunk
+        chunks.append({
+            'text': dtypes_info,
+            'chunk_id': f"{source_name}_dtypes",
+            'source': source_name,
+            'file_path': csv_path,
+            'file_type': 'csv',
+            'data_type': 'schema'
+        })
+        
+        # Statistics chunk
+        chunks.append({
+            'text': stats_info,
+            'chunk_id': f"{source_name}_stats",
+            'source': source_name,
+            'file_path': csv_path,
+            'file_type': 'csv',
+            'data_type': 'statistics'
+        })
+        
+        # Sample data chunk
+        chunks.append({
+            'text': sample_data,
+            'chunk_id': f"{source_name}_sample",
+            'source': source_name,
+            'file_path': csv_path,
+            'file_type': 'csv',
+            'data_type': 'sample'
+        })
+        
+        # Enhanced network KPI analysis chunk
+        kpi_analysis = analyze_network_kpis_enhanced(df, source_name)
+        chunks.append({
+            'text': kpi_analysis,
+            'chunk_id': f"{source_name}_kpi_analysis",
+            'source': source_name,
+            'file_path': csv_path,
+            'file_type': 'csv',
+            'data_type': 'kpi_analysis'
+        })
+        
+        logger.info(f"Processed CSV: {source_name} ({len(chunks)} chunks)")
+        return chunks
+    except Exception as e:
+        logger.error(f"Error processing CSV {csv_path}: {e}")
+        return []
+
+# Enhanced network KPI analysis function
+def analyze_network_kpis_enhanced(df: pd.DataFrame, source_name: str) -> str:
+    """Enhanced analysis of network KPI metrics from CSV data"""
+    try:
+        analysis = f"Enhanced Network KPI Analysis for {source_name}:\n\n"
+        
+        # Look for common RF engineering metrics with expanded keywords
+        rf_metrics = {
+            'signal_strength': ['rsrp', 'rsrq', 'rssi', 'signal_strength', 'power', 'dbm', 'signal_power'],
+            'quality': ['sinr', 'snr', 'quality', 'ber', 'fer', 'signal_quality', 'link_quality'],
+            'throughput': ['throughput', 'data_rate', 'speed', 'mbps', 'kbps', 'bandwidth', 'capacity'],
+            'coverage': ['coverage', 'distance', 'range', 'area', 'coverage_area', 'cell_coverage'],
+            'interference': ['interference', 'noise', 'interference_ratio', 'noise_floor', 'interference_power'],
+            'latency': ['latency', 'delay', 'ping', 'rtt', 'response_time', 'propagation_delay'],
+            'mobility': ['handover', 'mobility', 'roaming', 'cell_change', 'location_update'],
+            'capacity': ['capacity', 'load', 'utilization', 'congestion', 'traffic_load']
+        }
+        
+        found_metrics = {}
+        columns_lower = [col.lower() for col in df.columns]
+        
+        for category, keywords in rf_metrics.items():
+            found_metrics[category] = []
+            for keyword in keywords:
+                for col in df.columns:
+                    if keyword in col.lower():
+                        found_metrics[category].append(col)
+        
+        # Analyze found metrics with enhanced insights
+        for category, metrics in found_metrics.items():
+            if metrics:
+                analysis += f"{category.replace('_', ' ').title()} Metrics Found:\n"
+                for metric in metrics:
+                    if metric in df.columns:
+                        col_data = df[metric].dropna()
+                        if len(col_data) > 0:
+                            if pd.api.types.is_numeric_dtype(col_data):
+                                mean_val = col_data.mean()
+                                std_val = col_data.std()
+                                min_val = col_data.min()
+                                max_val = col_data.max()
+                                median_val = col_data.median()
+                                
+                                analysis += f"  - {metric}:\n"
+                                analysis += f"    Mean: {mean_val:.4f}\n"
+                                analysis += f"    Std: {std_val:.4f}\n"
+                                analysis += f"    Min: {min_val:.4f}\n"
+                                analysis += f"    Max: {max_val:.4f}\n"
+                                analysis += f"    Median: {median_val:.4f}\n"
+                                
+                                # Add interpretation for common metrics
+                                if 'rsrp' in metric.lower():
+                                    if mean_val > -80:
+                                        analysis += f"    Interpretation: Excellent signal strength\n"
+                                    elif mean_val > -100:
+                                        analysis += f"    Interpretation: Good signal strength\n"
+                                    else:
+                                        analysis += f"    Interpretation: Poor signal strength\n"
+                                elif 'sinr' in metric.lower():
+                                    if mean_val > 20:
+                                        analysis += f"    Interpretation: Excellent signal quality\n"
+                                    elif mean_val > 10:
+                                        analysis += f"    Interpretation: Good signal quality\n"
+                                    else:
+                                        analysis += f"    Interpretation: Poor signal quality\n"
+                            else:
+                                unique_count = col_data.nunique()
+                                analysis += f"  - {metric}: {unique_count} unique values\n"
+                analysis += "\n"
+        
+        if not any(found_metrics.values()):
+            analysis += "No specific RF engineering metrics found. This may be a general dataset.\n"
+        
+        return analysis
+    except Exception as e:
+        return f"Error analyzing KPIs: {str(e)}"
+
+# Enhanced text chunking function with overlap
+def split_text_into_chunks_enhanced(text: str, max_length: int, overlap: int) -> List[str]:
+    """Split text into enhanced chunks using sentence boundaries with overlap"""
+    # Clean and normalize text
+    text = re.sub(r'\s+', ' ', text.strip())
+    
+    # Split by sentences first
+    sentences = re.split(r'[.!?]+', text)
+    chunks = []
+    current_chunk = ""
+    
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+            
+        # If adding this sentence would exceed max_length, save current chunk
+        if len(current_chunk) + len(sentence) + 1 > max_length and current_chunk:
+            chunks.append(current_chunk.strip())
+            # Start new chunk with overlap from previous chunk
+            if overlap > 0 and current_chunk:
+                overlap_text = current_chunk[-overlap:] if len(current_chunk) > overlap else current_chunk
+                current_chunk = overlap_text + ". " + sentence
+            else:
+                current_chunk = sentence
+        else:
+            if current_chunk:
+                current_chunk += ". " + sentence
+            else:
+                current_chunk = sentence
+    
+    # Add the last chunk if it exists
+    if current_chunk:
+        chunks.append(current_chunk.strip())
+    
+    return chunks
+
+# Enhanced batch processing for knowledge base
+def add_to_knowledge_base_enhanced(chunks: List[Dict]):
+    """Add chunks to knowledge base with enhanced processing"""
+    try:
+        for i in range(0, len(chunks), BATCH_SIZE):
+            batch = chunks[i:i + BATCH_SIZE]
+            
+            # Prepare batch data
+            texts = [chunk['text'] for chunk in batch]
+            metadatas = [{
+                'source': chunk.get('source', 'unknown'),
+                'file_type': chunk.get('file_type', 'unknown'),
+                'page': chunk.get('page', ''),
+                'chunk_id': chunk.get('chunk_id', ''),
+                'file_path': chunk.get('file_path', ''),
+                'data_type': chunk.get('data_type', ''),
+                'chunk_index': chunk.get('chunk_index', ''),
+                'total_chunks': chunk.get('total_chunks', '')
+            } for chunk in batch]
+            ids = [chunk.get('chunk_id', f"chunk_{i}_{j}") for j, chunk in enumerate(batch)]
+            
+            # Generate embeddings
+            embeddings = generate_embeddings(texts)
+            
+            if embeddings:
+                # Add to ChromaDB
+                knowledge_collection.add(
+                    embeddings=embeddings,
+                    documents=texts,
+                    metadatas=metadatas,
+                    ids=ids
+                )
+                logger.info(f"Added batch {i//BATCH_SIZE + 1} with {len(batch)} chunks")
+            else:
+                logger.error(f"Failed to generate embeddings for batch {i//BATCH_SIZE + 1}")
+        
+        return True
+    except Exception as e:
+        logger.error(f"Error adding batch to knowledge base: {e}")
+        return False
+
+# Enhanced search function with multiple retrieval methods
+def search_knowledge_base_enhanced(query: str, top_k: int = 8) -> List[Dict]:
+    """Enhanced search with multiple retrieval methods and reranking"""
+    try:
+        # Generate query embedding
+        query_embedding = generate_embeddings([query])[0]
+        
+        if not query_embedding:
+            logger.error("Failed to generate query embedding")
+            return []
+        
+        # Search in ChromaDB with more results for reranking
+        results = knowledge_collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k * 2,  # Get more results for reranking
+            include=['documents', 'metadatas', 'distances']
+        )
+        
+        # Format results
+        formatted_results = []
+        if results['documents'] and results['documents'][0]:
+            for i, doc in enumerate(results['documents'][0]):
+                metadata = results['metadatas'][0][i] if results['metadatas'] and results['metadatas'][0] else {}
+                distance = results['distances'][0][i] if results['distances'] and results['distances'][0] else 0
+                relevance_score = 1 - distance
+                
+                # Apply minimum relevance threshold
+                if relevance_score >= MIN_RELEVANCE_SCORE:
+                    formatted_results.append({
+                        'text': doc,
+                        'metadata': metadata,
+                        'relevance_score': relevance_score,
+                        'distance': distance
+                    })
+        
+        # Rerank results if enabled
+        if ENABLE_RERANKING and formatted_results:
+            formatted_results = rerank_results(query, formatted_results)
+        
+        # Return top_k results
+        return formatted_results[:top_k]
+        
+    except Exception as e:
+        logger.error(f"Error searching knowledge base: {e}")
+        return []
+
+# Result reranking function
+def rerank_results(query: str, results: List[Dict]) -> List[Dict]:
+    """Rerank results based on multiple factors"""
+    try:
+        query_lower = query.lower()
+        
+        for result in results:
+            text_lower = result['text'].lower()
+            
+            # Calculate keyword match score
+            query_words = set(query_lower.split())
+            text_words = set(text_lower.split())
+            keyword_overlap = len(query_words.intersection(text_words)) / len(query_words) if query_words else 0
+            
+            # Calculate length penalty (prefer medium-length chunks)
+            length_penalty = 1.0
+            text_length = len(result['text'])
+            if text_length < 100:
+                length_penalty = 0.8  # Penalize very short chunks
+            elif text_length > 2000:
+                length_penalty = 0.9  # Slightly penalize very long chunks
+            
+            # Combine scores
+            final_score = (result['relevance_score'] * 0.7 + keyword_overlap * 0.3) * length_penalty
+            result['final_score'] = final_score
+        
+        # Sort by final score
+        results.sort(key=lambda x: x['final_score'], reverse=True)
+        return results
+        
+    except Exception as e:
+        logger.error(f"Error reranking results: {e}")
+        return results
+
+# File discovery functions
+def get_pdf_files_from_directory(directory: str) -> Dict[str, str]:
+    """Get all PDF files from a directory"""
+    pdf_files = {}
+    try:
+        if not os.path.exists(directory):
+            logger.warning(f"Directory does not exist: {directory}")
+            return {}
+        
+        pdf_pattern = os.path.join(directory, "*.pdf")
+        pdf_paths = glob.glob(pdf_pattern)
+        
+        for pdf_path in pdf_paths:
+            filename = os.path.basename(pdf_path)
+            source_name = os.path.splitext(filename)[0]
+            pdf_files[source_name] = pdf_path
+            
+        return pdf_files
+    except Exception as e:
+        logger.error(f"Error scanning directory {directory}: {e}")
+        return {}
+
+def get_csv_files_from_directory(directory: str) -> Dict[str, str]:
+    """Get all CSV files from a directory"""
+    csv_files = {}
+    try:
+        if not os.path.exists(directory):
+            logger.warning(f"Directory does not exist: {directory}")
+            return {}
+        
+        csv_pattern = os.path.join(directory, "*.csv")
+        csv_paths = glob.glob(csv_pattern)
+        
+        for csv_path in csv_paths:
+            filename = os.path.basename(csv_path)
+            source_name = os.path.splitext(filename)[0]
+            csv_files[source_name] = csv_path
+            
+        return csv_files
+    except Exception as e:
+        logger.error(f"Error scanning directory {directory}: {e}")
+        return {}
+
+# Parallel processing function
+def process_file_parallel(file_path: str, file_type: str, source_name: str) -> List[Dict]:
+    """Process a single file in parallel"""
+    try:
+        if file_type == 'pdf':
+            return process_pdf_enhanced(file_path, source_name)
+        elif file_type == 'csv':
+            return process_csv_enhanced(file_path, source_name)
+        else:
+            return []
+    except Exception as e:
+        logger.error(f"Error processing {file_type} file {file_path}: {e}")
+        return []
+
+# Enhanced knowledge base initialization
+def initialize_knowledge_base_enhanced():
+    """Initialize knowledge base with enhanced processing"""
+    logger.info("🚀 Initializing Enhanced T-Mobile RF AI Agent Knowledge Base...")
+    
+    all_chunks = []
+    processed_files = []
+    
+    start_time = time.time()
+    
+    # Process PDF files
+    if AUTO_LOAD_PDFS:
+        logger.info(f"📚 Processing PDF files from: {PDF_DIRECTORY}")
+        pdf_files = get_pdf_files_from_directory(PDF_DIRECTORY)
+        
+        if pdf_files:
+            logger.info(f"Found {len(pdf_files)} PDF files")
+            
+            # Get unprocessed files
+            if ENABLE_INCREMENTAL:
+                unprocessed_pdfs = file_tracker.get_unprocessed_files(list(pdf_files.values()))
+                logger.info(f"Processing {len(unprocessed_pdfs)} new/modified PDF files")
+            else:
+                unprocessed_pdfs = list(pdf_files.values())
+            
+            # Process files in parallel
+            with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                future_to_file = {}
+                for source_name, pdf_path in pdf_files.items():
+                    if pdf_path in unprocessed_pdfs:
+                        future = executor.submit(process_file_parallel, pdf_path, 'pdf', source_name)
+                        future_to_file[future] = (source_name, pdf_path)
+                
+                for future in as_completed(future_to_file):
+                    source_name, pdf_path = future_to_file[future]
+                    try:
+                        chunks = future.result()
+                        if chunks:
+                            all_chunks.extend(chunks)
+                            processed_files.append(f"PDF: {source_name}")
+                            file_tracker.mark_file_processed(pdf_path, len(chunks))
+                            logger.info(f"✅ Added {len(chunks)} chunks from {source_name}")
+                        else:
+                            logger.warning(f"⚠️ No chunks extracted from {source_name}")
+                    except Exception as e:
+                        logger.error(f"❌ Error processing {source_name}: {e}")
+        else:
+            logger.warning(f"No PDF files found in {PDF_DIRECTORY}")
+    
+    # Process CSV files
+    if AUTO_LOAD_CSVS:
+        logger.info(f"📊 Processing CSV files from: {CSV_DIRECTORY}")
+        csv_files = get_csv_files_from_directory(CSV_DIRECTORY)
+        
+        if csv_files:
+            logger.info(f"Found {len(csv_files)} CSV files")
+            
+            # Get unprocessed files
+            if ENABLE_INCREMENTAL:
+                unprocessed_csvs = file_tracker.get_unprocessed_files(list(csv_files.values()))
+                logger.info(f"Processing {len(unprocessed_csvs)} new/modified CSV files")
+            else:
+                unprocessed_csvs = list(csv_files.values())
+            
+            # Process files in parallel
+            with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                future_to_file = {}
+                for source_name, csv_path in csv_files.items():
+                    if csv_path in unprocessed_csvs:
+                        future = executor.submit(process_file_parallel, csv_path, 'csv', source_name)
+                        future_to_file[future] = (source_name, csv_path)
+                
+                for future in as_completed(future_to_file):
+                    source_name, csv_path = future_to_file[future]
+                    try:
+                        chunks = future.result()
+                        if chunks:
+                            all_chunks.extend(chunks)
+                            processed_files.append(f"CSV: {source_name}")
+                            file_tracker.mark_file_processed(csv_path, len(chunks))
+                            logger.info(f"✅ Added {len(chunks)} chunks from {source_name}")
+                        else:
+                            logger.warning(f"⚠️ No chunks extracted from {source_name}")
+                    except Exception as e:
+                        logger.error(f"❌ Error processing {source_name}: {e}")
+        else:
+            logger.warning(f"No CSV files found in {CSV_DIRECTORY}")
+    
+    # Add chunks to knowledge base
+    if all_chunks:
+        logger.info(f"Adding {len(all_chunks)} chunks to knowledge base...")
+        success = add_to_knowledge_base_enhanced(all_chunks)
+        if success:
+            end_time = time.time()
+            processing_time = end_time - start_time
+            logger.info(f"✅ Successfully added {len(all_chunks)} total chunks to knowledge base")
+            logger.info(f"Processed files: {', '.join(processed_files)}")
+            logger.info(f"⏱️ Processing time: {processing_time:.2f} seconds")
+        else:
+            logger.error("❌ Failed to add chunks to knowledge base")
+    else:
+        logger.info("ℹ️ No new files to process (all files are up to date)")
+
+# Background processing task
+async def process_files_background():
+    """Background task for processing files"""
+    while True:
+        try:
+            initialize_knowledge_base_enhanced()
+            await asyncio.sleep(300)  # Check every 5 minutes
+        except Exception as e:
+            logger.error(f"Error in background processing: {e}")
+            await asyncio.sleep(60)
+
+# Routes
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
+
+@app.get("/rf-ai-agent", response_class=HTMLResponse)
+async def rf_ai_agent(request: Request):
+    return templates.TemplateResponse("rf_ai_agent.html", {"request": request})
+
+@app.post("/chat")
+async def chat(message: str = Form(...)):
+    """Enhanced chat with improved RAG implementation"""
+    try:
+        start_time = time.time()
+        
+        # Search knowledge base for relevant information
+        relevant_docs = search_knowledge_base_enhanced(message, top_k=8)
+        
+        # Create enhanced context from relevant documents
+        context = ""
+        if relevant_docs:
+            context_parts = []
+            for doc in relevant_docs:
+                source_info = f"[Source: {doc['metadata'].get('source', 'unknown')}"
+                if doc['metadata'].get('file_type') == 'csv':
+                    source_info += f", Type: {doc['metadata'].get('data_type', 'data')}"
+                elif doc['metadata'].get('file_type') == 'pdf':
+                    source_info += f", Page: {doc['metadata'].get('page', 'unknown')}"
+                source_info += f", Relevance: {doc.get('relevance_score', 0):.3f}]"
+                context_parts.append(f"{doc['text']}\n{source_info}")
+            
+            context = "\n\n".join(context_parts)
+            
+            # Limit context length to prevent token overflow
+            if len(context) > MAX_CONTEXT_LENGTH:
+                context = context[:MAX_CONTEXT_LENGTH] + "... [truncated]"
+            
+            context = f"\n\nRelevant information from knowledge base:\n{context}"
+        
+        # Enhanced system prompt with better RAG instructions
+        system_prompt = f"""You are a helpful AI assistant specialized in RF engineering and network performance analysis. 
+        
+        CRITICAL INSTRUCTIONS FOR RAG:
+        1. ALWAYS use the provided knowledge base information when available
+        2. Cite specific sources when referencing information from the knowledge base
+        3. If the knowledge base contains relevant information, prioritize it over general knowledge
+        4. Be specific and detailed when using knowledge base information
+        5. If you don't find relevant information in the knowledge base, say so clearly
+        
+        You have access to additional knowledge from multiple PDF documents and CSV files containing KPI metrics and network performance data.
+        When using this knowledge, make sure to integrate it naturally into your responses and cite the sources.
+        
+        For network performance questions, focus on KPI metrics, signal quality, coverage analysis, and engineering insights.
+        Be ready to discuss RF engineering concepts, network optimization, and performance evaluation.
+        
+        Additional knowledge context:{context}"""
+        
+        # Send message to OpenAI
+        response = client.chat.completions.create(
+            model="gpt-4",
+            max_tokens=1500,  # Increased for more detailed responses
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ],
+            temperature=0.3  # Lower temperature for more focused responses
+        )
+        
+        response_time = time.time() - start_time
+        
+        # Log the interaction for analysis
+        logger.info(f"Query: {message[:100]}... | Docs found: {len(relevant_docs)} | Response time: {response_time:.2f}s")
+        
+        return {
+            "response": response.choices[0].message.content,
+            "rag_metrics": {
+                "documents_retrieved": len(relevant_docs),
+                "average_relevance": round(sum(doc.get('relevance_score', 0) for doc in relevant_docs) / len(relevant_docs), 3) if relevant_docs else 0,
+                "response_time_seconds": round(response_time, 2)
+            }
+        }
+    
+    except Exception as e:
+        logger.error(f"Error in chat: {e}")
+        return {"response": f"Sorry, I'm having some technical difficulties: {str(e)}"}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "model": "OpenAI GPT-4 (Enhanced RAG)", "timestamp": datetime.now().isoformat()}
+
+@app.get("/knowledge-status")
+async def knowledge_status():
+    """Enhanced knowledge base status"""
+    try:
+        count = knowledge_collection.count()
+        
+        # Get detailed statistics
+        if count > 0:
+            results = knowledge_collection.get()
+            sources = set()
+            file_types = set()
+            data_types = set()
+            
+            for metadata in results['metadatas']:
+                if metadata and 'source' in metadata:
+                    sources.add(metadata['source'])
+                if metadata and 'file_type' in metadata:
+                    file_types.add(metadata['file_type'])
+                if metadata and 'data_type' in metadata:
+                    data_types.add(metadata['data_type'])
+            
+            sources_list = list(sources)
+            file_types_list = list(file_types)
+            data_types_list = list(data_types)
+        else:
+            sources_list = []
+            file_types_list = []
+            data_types_list = []
+        
+        return {
+            "status": "success",
+            "knowledge_chunks": count,
+            "sources": sources_list,
+            "file_types": file_types_list,
+            "data_types": data_types_list,
+            "message": f"Enhanced knowledge base contains {count} chunks from {len(sources_list)} sources",
+            "rag_config": {
+                "embedding_model": EMBEDDING_MODEL,
+                "min_relevance_score": MIN_RELEVANCE_SCORE,
+                "chunk_size": CHUNK_SIZE,
+                "chunk_overlap": CHUNK_OVERLAP,
+                "enable_reranking": ENABLE_RERANKING
+            }
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.get("/file-sources")
+async def get_file_sources():
+    """Get enhanced file sources information"""
+    try:
+        sources_info = {
+            "pdf_directory": PDF_DIRECTORY if AUTO_LOAD_PDFS else None,
+            "csv_directory": CSV_DIRECTORY if AUTO_LOAD_CSVS else None,
+            "cache_directory": CACHE_DIRECTORY,
+            "auto_load_pdfs": AUTO_LOAD_PDFS,
+            "auto_load_csvs": AUTO_LOAD_CSVS,
+            "enable_caching": ENABLE_CACHING,
+            "enable_incremental": ENABLE_INCREMENTAL,
+            "max_workers": MAX_WORKERS,
+            "batch_size": BATCH_SIZE,
+            "chunk_size": CHUNK_SIZE,
+            "chunk_overlap": CHUNK_OVERLAP
+        }
+        
+        if AUTO_LOAD_PDFS:
+            pdf_files = get_pdf_files_from_directory(PDF_DIRECTORY)
+            sources_info["pdf_files"] = pdf_files
+            sources_info["pdf_count"] = len(pdf_files)
+        
+        if AUTO_LOAD_CSVS:
+            csv_files = get_csv_files_from_directory(CSV_DIRECTORY)
+            sources_info["csv_files"] = csv_files
+            sources_info["csv_count"] = len(csv_files)
+        
+        return sources_info
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.post("/refresh-knowledge-base")
+async def refresh_knowledge_base(background_tasks: BackgroundTasks):
+    """Manually refresh the knowledge base"""
+    try:
+        background_tasks.add_task(initialize_knowledge_base_enhanced)
+        return {"status": "success", "message": "Enhanced knowledge base refresh started in background"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# RAG Evaluation Endpoints
+@app.get("/rag-evaluation")
+async def rag_evaluation_dashboard():
+    """Get comprehensive RAG evaluation metrics"""
+    try:
+        kb_stats = await knowledge_status()
+        
+        embedding_stats = {
+            "embedding_model": EMBEDDING_MODEL,
+            "embedding_dimensions": 1536,
+            "total_embeddings": knowledge_collection.count(),
+            "embedding_quality": "High (OpenAI ada-002)"
+        }
+        
+        return {
+            "status": "success",
+            "knowledge_base": kb_stats,
+            "embedding_performance": embedding_stats,
+            "evaluation_timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+@app.post("/test-rag-query")
+async def test_rag_query(query: str = Form(...), top_k: int = Form(8)):
+    """Test RAG query and return detailed analysis"""
+    try:
+        start_time = time.time()
+        relevant_docs = search_knowledge_base_enhanced(query, top_k)
+        search_time = time.time() - start_time
+        
+        analysis = {
+            "query": query,
+            "search_time_seconds": round(search_time, 3),
+            "documents_found": len(relevant_docs),
+            "average_relevance_score": 0,
+            "source_distribution": {},
+            "top_sources": []
+        }
+        
+        if relevant_docs:
+            relevance_scores = [doc.get('relevance_score', 0) for doc in relevant_docs]
+            analysis["average_relevance_score"] = round(sum(relevance_scores) / len(relevance_scores), 3)
+            
+            sources = {}
+            for doc in relevant_docs:
+                source = doc['metadata'].get('source', 'unknown')
+                sources[source] = sources.get(source, 0) + 1
+            
+            analysis["source_distribution"] = sources
+        
+        return {"status": "success", "analysis": analysis, "relevant_documents": relevant_docs}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# Maintenance page routes
+@app.get("/network-analyzer", response_class=HTMLResponse)
+async def network_analyzer(request: Request):
+    return templates.TemplateResponse("network_analyzer.html", {"request": request})
+
+@app.get("/coverage-planner", response_class=HTMLResponse)
+async def coverage_planner(request: Request):
+    return templates.TemplateResponse("coverage_planner.html", {"request": request})
+
+@app.get("/kpi-dashboard", response_class=HTMLResponse)
+async def kpi_dashboard(request: Request):
+    return templates.TemplateResponse("kpi_dashboard.html", {"request": request})
+
+@app.get("/troubleshooting-guide", response_class=HTMLResponse)
+async def troubleshooting_guide(request: Request):
+    return templates.TemplateResponse("troubleshooting_guide.html", {"request": request})
+
+@app.get("/documentation-hub", response_class=HTMLResponse)
+async def documentation_hub(request: Request):
+    return templates.TemplateResponse("documentation_hub.html", {"request": request})
+
+# Startup event
+@app.on_event("startup")
+async def startup_event():
+    """Initialize enhanced knowledge base on startup"""
+    initialize_knowledge_base_enhanced()
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000) 

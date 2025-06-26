@@ -3,12 +3,12 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import anthropic
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import json
 import PyPDF2
 import chromadb
-from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import List, Dict, Set
 import re
@@ -40,8 +40,44 @@ client = anthropic.Anthropic(
     api_key=os.getenv("ANTHROPIC_API_KEY", "your-api-key-here")
 )
 
+# Initialize OpenAI client
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "your-api-key-here"))
+
+# OpenAI embedding model configuration
+EMBEDDING_MODEL = "text-embedding-ada-002"  # OpenAI's embedding model
+
+# Function to generate embeddings using OpenAI
+def generate_embeddings(texts: List[str]) -> List[List[float]]:
+    """Generate embeddings using OpenAI's embedding model"""
+    try:
+        if isinstance(texts, str):
+            texts = [texts]
+        
+        # Clean and prepare texts
+        cleaned_texts = []
+        for text in texts:
+            # Truncate text if it's too long (OpenAI has a limit)
+            if len(text) > 8000:  # OpenAI's limit is 8192 tokens, but we'll be conservative
+                text = text[:8000]
+            cleaned_texts.append(text)
+        
+        # Generate embeddings
+        response = openai_client.embeddings.create(
+            model=EMBEDDING_MODEL,
+            input=cleaned_texts
+        )
+        
+        # Extract embeddings
+        embeddings = [data.embedding for data in response.data]
+        return embeddings
+    except Exception as e:
+        print(f"Error generating embeddings: {e}")
+        return []
+
 # Initialize sentence transformer for embeddings
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+EMBEDDING_MODEL = " text-embedding-ada-002\('all-MiniLM-L6-v2')
+# embedding_model.save(r'C:\Users\magno\unliAnalytics')
+
 
 # Initialize ChromaDB for vector storage
 chroma_client = chromadb.Client()
@@ -345,7 +381,7 @@ def add_to_knowledge_base_batch(chunks: List[Dict]):
             ids = [chunk['chunk_id'] for chunk in batch]
             
             # Generate embeddings in batch
-            embeddings = embedding_model.encode(texts).tolist()
+            embeddings = generate_embeddings(texts)
             
             # Add to collection
             knowledge_collection.add(
@@ -364,7 +400,7 @@ def search_knowledge_base_optimized(query: str, top_k: int = 5) -> List[Dict]:
     """Search the knowledge base with optimized retrieval"""
     try:
         # Generate query embedding
-        query_embedding = embedding_model.encode([query]).tolist()
+        query_embedding = generate_embeddings([query])[0]
         
         # Search collection with optimized parameters
         results = knowledge_collection.query(

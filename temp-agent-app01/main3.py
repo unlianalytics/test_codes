@@ -742,7 +742,7 @@ async def chat(message: str = Form(...)):
             
             context = f"\n\nRelevant information from knowledge base:\n{context}"
         
-        # Enhanced system prompt with better RAG instructions
+        # Enhanced system prompt with better RAG instructions and formatting
         system_prompt = f"""You are a helpful AI assistant specialized in RF engineering and network performance analysis. 
         
         CRITICAL INSTRUCTIONS FOR RAG:
@@ -751,6 +751,18 @@ async def chat(message: str = Form(...)):
         3. If the knowledge base contains relevant information, prioritize it over general knowledge
         4. Be specific and detailed when using knowledge base information
         5. If you don't find relevant information in the knowledge base, say so clearly
+        
+        RESPONSE FORMATTING INSTRUCTIONS:
+        - Format your responses with proper HTML markup for better readability
+        - Use <h3> tags for section headers (e.g., <h3>Key Points</h3>)
+        - Use <ul> and <li> tags for bullet points and lists
+        - Use <strong> tags for important terms and concepts
+        - Use <em> tags for emphasis
+        - Use <p> tags to separate paragraphs
+        - Use <code> tags for technical terms, parameters, or code snippets
+        - Use <blockquote> tags when citing specific information from sources
+        - Structure complex responses with clear sections and subsections
+        - Make your responses visually appealing and easy to scan
         
         You have access to additional knowledge from multiple PDF documents and CSV files containing KPI metrics and network performance data.
         When using this knowledge, make sure to integrate it naturally into your responses and cite the sources.
@@ -956,6 +968,36 @@ async def troubleshooting_guide(request: Request):
 @app.get("/documentation-hub", response_class=HTMLResponse)
 async def documentation_hub(request: Request):
     return templates.TemplateResponse("documentation_hub.html", {"request": request})
+
+@app.get("/parameter-search", response_class=HTMLResponse)
+async def parameter_search(request: Request):
+    """Parameter Search page"""
+    return templates.TemplateResponse("parameter_search.html", {"request": request})
+
+@app.get("/parameter-audit", response_class=HTMLResponse)
+async def parameter_audit(request: Request):
+    """Parameter Audit page"""
+    return templates.TemplateResponse("parameter_audit.html", {"request": request})
+
+@app.get("/knowledge-base", response_class=HTMLResponse)
+async def knowledge_base(request: Request):
+    """Knowledge Base page"""
+    return templates.TemplateResponse("knowledge_base.html", {"request": request})
+
+@app.get("/technical-specs", response_class=HTMLResponse)
+async def technical_specs(request: Request):
+    """Technical Specifications page"""
+    return templates.TemplateResponse("technical_specs.html", {"request": request})
+
+@app.get("/best-practices", response_class=HTMLResponse)
+async def best_practices(request: Request):
+    """Best Practices page"""
+    return templates.TemplateResponse("best_practices.html", {"request": request})
+
+@app.get("/training-resources", response_class=HTMLResponse)
+async def training_resources(request: Request):
+    """Training Resources page"""
+    return templates.TemplateResponse("training_resources.html", {"request": request})
 
 # Startup event
 @app.on_event("startup")

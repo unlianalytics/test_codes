@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Base - T-Mobile Documentation Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/documentation_hub.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="tmobile-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='/tmo_logo.png') }}" alt="T-Mobile Logo" class="logo-image">
+                </div>
+            </div>
+            <div class="header-navigation">
+                <a href="/documentation-hub" class="back-button">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Back to Hub</span>
+                </a>
+            </div>
+            <h1>Knowledge Base</h1>
+            <p class="subtitle">Comprehensive knowledge repository with AI-powered search</p>
+        </header>
+
+        <main class="documentation-container">
+            <div class="kb-stats">
+                <div class="stat-card">
+                    <div class="stat-number">2,847</div>
+                    <div class="stat-label">Articles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">156</div>
+                    <div class="stat-label">PDF Documents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">89</div>
+                    <div class="stat-label">Video Tutorials</div>
+                </div>
+            </div>
+
+            <div class="kb-search">
+                <div class="search-box">
+                    <input type="text" placeholder="Search knowledge base..." class="search-input">
+                    <button class="search-button">🔍 Search</button>
+                </div>
+            </div>
+
+            <div class="kb-categories">
+                <h2>Knowledge Categories</h2>
+                <div class="category-grid">
+                    <div class="category-card">
+                        <div class="category-icon">📡</div>
+                        <h3>RF Engineering</h3>
+                        <p>Antenna theory, propagation, and RF optimization</p>
+                        <span class="article-count">847 articles</span>
+                    </div>
+                    
+                    <div class="category-card">
+                        <div class="category-icon">📱</div>
+                        <h3>Network Technologies</h3>
+                        <p>LTE, NR, GSM, and UMTS technologies</p>
+                        <span class="article-count">623 articles</span>
+                    </div>
+                    
+                    <div class="category-card">
+                        <div class="category-icon">⚙️</div>
+                        <h3>Equipment & Hardware</h3>
+                        <p>Base stations, antennas, and network equipment</p>
+                        <span class="article-count">456 articles</span>
+                    </div>
+                    
+                    <div class="category-card">
+                        <div class="category-icon">📊</div>
+                        <h3>Performance & KPIs</h3>
+                        <p>Network performance metrics and optimization</p>
+                        <span class="article-count">389 articles</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by T-Mobile RF Engineering • Knowledge Base • Active</p>
+        </footer>
+    </div>
+</body>
+</html> 

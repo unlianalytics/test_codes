@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parameter Audit - T-Mobile Documentation Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/documentation_hub.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="tmobile-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='/tmo_logo.png') }}" alt="T-Mobile Logo" class="logo-image">
+                </div>
+            </div>
+            <div class="header-navigation">
+                <a href="/documentation-hub" class="back-button">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Back to Hub</span>
+                </a>
+            </div>
+            <h1>Parameter Audit</h1>
+            <p class="subtitle">Comprehensive audit tools for RF parameters with compliance checking</p>
+        </header>
+
+        <main class="documentation-container">
+            <div class="audit-dashboard">
+                <div class="audit-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">1,247</div>
+                        <div class="stat-label">Parameters Audited</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">98.5%</div>
+                        <div class="stat-label">Compliance Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">19</div>
+                        <div class="stat-label">Issues Found</div>
+                    </div>
+                </div>
+
+                <div class="audit-section">
+                    <h2>Recent Audit Results</h2>
+                    <div class="audit-results">
+                        <div class="audit-item compliant">
+                            <div class="audit-icon">✅</div>
+                            <div class="audit-content">
+                                <h3>LTE RSRP Thresholds</h3>
+                                <p>All 156 LTE sites compliant with RSRP threshold standards</p>
+                                <span class="audit-date">Audited: 2024-01-15</span>
+                            </div>
+                        </div>
+                        
+                        <div class="audit-item warning">
+                            <div class="audit-icon">⚠️</div>
+                            <div class="audit-content">
+                                <h3>NR SINR Targets</h3>
+                                <p>3 sites have SINR targets below recommended values</p>
+                                <span class="audit-date">Audited: 2024-01-14</span>
+                            </div>
+                        </div>
+                        
+                        <div class="audit-item compliant">
+                            <div class="audit-icon">✅</div>
+                            <div class="audit-content">
+                                <h3>Handover Parameters</h3>
+                                <p>All handover margins within acceptable ranges</p>
+                                <span class="audit-date">Audited: 2024-01-13</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compliance-section">
+                    <h2>Compliance Standards</h2>
+                    <div class="standards-grid">
+                        <div class="standard-card">
+                            <h3>3GPP Standards</h3>
+                            <p>Compliance with 3GPP TS 36.331 and related specifications</p>
+                            <div class="compliance-rate">99.2%</div>
+                        </div>
+                        
+                        <div class="standard-card">
+                            <h3>T-Mobile Standards</h3>
+                            <p>Internal T-Mobile parameter optimization guidelines</p>
+                            <div class="compliance-rate">97.8%</div>
+                        </div>
+                        
+                        <div class="standard-card">
+                            <h3>FCC Requirements</h3>
+                            <p>Federal Communications Commission compliance requirements</p>
+                            <div class="compliance-rate">100%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by T-Mobile RF Engineering • Parameter Audit • Active</p>
+        </footer>
+    </div>
+</body>
+</html> 

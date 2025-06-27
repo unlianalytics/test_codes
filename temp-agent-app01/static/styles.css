@@ -227,6 +227,8 @@ body {
     line-height: 1.5;
     box-shadow: var(--shadow);
     border-left: 4px solid var(--texas-red);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .user-message .message-text {
@@ -765,4 +767,125 @@ body {
     .team-section, .contact-section, .hours-section, .response-info {
         padding: 12px;
     }
+}
+
+/* Enhanced Message Text Styling for Formatted Content */
+.message-text {
+    background: var(--texas-gray);
+    padding: 15px 20px;
+    border-radius: 18px;
+    max-width: 80%;
+    line-height: 1.5;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--texas-red);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Formatted Content Styles */
+.message-text h3 {
+    color: var(--texas-red);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 15px 0 8px 0;
+    border-bottom: 2px solid var(--texas-blue);
+    padding-bottom: 5px;
+}
+
+.message-text h4 {
+    color: var(--texas-blue);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 12px 0 6px 0;
+}
+
+.message-text p {
+    margin: 8px 0;
+    line-height: 1.6;
+}
+
+.message-text ul, .message-text ol {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.message-text li {
+    margin: 4px 0;
+    line-height: 1.5;
+}
+
+.message-text strong {
+    color: var(--texas-red);
+    font-weight: 600;
+}
+
+.message-text em {
+    color: var(--texas-blue);
+    font-style: italic;
+}
+
+.message-text code {
+    background: rgba(0, 40, 104, 0.1);
+    color: var(--texas-blue);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    border: 1px solid rgba(0, 40, 104, 0.2);
+}
+
+.message-text blockquote {
+    background: rgba(208, 12, 51, 0.05);
+    border-left: 4px solid var(--texas-red);
+    margin: 10px 0;
+    padding: 10px 15px;
+    font-style: italic;
+    color: var(--texas-dark);
+    border-radius: 0 8px 8px 0;
+}
+
+.message-text blockquote::before {
+    content: '"';
+    font-size: 1.5rem;
+    color: var(--texas-red);
+    margin-right: 5px;
+}
+
+.message-text blockquote::after {
+    content: '"';
+    font-size: 1.5rem;
+    color: var(--texas-red);
+    margin-left: 5px;
+}
+
+/* Source citation styling */
+.message-text .source-citation {
+    font-size: 0.85rem;
+    color: var(--texas-blue);
+    font-style: italic;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0, 40, 104, 0.2);
+}
+
+/* Technical parameter styling */
+.message-text .parameter {
+    background: rgba(0, 40, 104, 0.1);
+    border: 1px solid var(--texas-blue);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--texas-blue);
+}
+
+/* KPI metric styling */
+.message-text .kpi-metric {
+    background: linear-gradient(135deg, rgba(208, 12, 51, 0.1) 0%, rgba(0, 40, 104, 0.1) 100%);
+    border: 1px solid var(--texas-red);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin: 8px 0;
+    font-weight: 600;
+    color: var(--texas-dark);
 } 

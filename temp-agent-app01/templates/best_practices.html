@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Practices - T-Mobile Documentation Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/documentation_hub.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="tmobile-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='/tmo_logo.png') }}" alt="T-Mobile Logo" class="logo-image">
+                </div>
+            </div>
+            <div class="header-navigation">
+                <a href="/documentation-hub" class="back-button">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Back to Hub</span>
+                </a>
+            </div>
+            <h1>Best Practices</h1>
+            <p class="subtitle">Industry best practices and guidelines for RF engineering</p>
+        </header>
+
+        <main class="documentation-container">
+            <div class="practices-section">
+                <h2>RF Engineering Best Practices</h2>
+                <ul class="practices-list">
+                    <li>Perform regular drive tests and site audits to ensure optimal coverage.</li>
+                    <li>Maintain up-to-date parameter documentation for all network elements.</li>
+                    <li>Use standardized naming conventions for sites and equipment.</li>
+                    <li>Monitor KPIs and set automated alerts for threshold violations.</li>
+                    <li>Document troubleshooting steps and solutions for recurring issues.</li>
+                    <li>Collaborate with cross-functional teams for network optimization.</li>
+                    <li>Adopt new 3GPP releases and vendor features after thorough testing.</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by T-Mobile RF Engineering • Best Practices • Active</p>
+        </footer>
+    </div>
+</body>
+</html> 

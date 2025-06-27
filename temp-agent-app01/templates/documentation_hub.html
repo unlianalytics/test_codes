@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentation Hub - T-Mobile Multi-App Platform</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/maintenance.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/documentation_hub.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -25,52 +25,104 @@
             <p class="subtitle">Centralized repository for T-Mobile RF engineering documentation and resources</p>
         </header>
 
-        <main class="maintenance-container">
-            <div class="maintenance-card">
-                <div class="maintenance-icon">📚</div>
-                <h2>Under Maintenance</h2>
-                <p class="maintenance-message">
-                    We're building a comprehensive documentation hub with parameter search capabilities, 
-                    parameter audit, and collaborative features for T-Mobile RF engineering resources.
-                </p>
-                
-                <div class="features-preview">
-                    <h3>Coming Features:</h3>
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <span class="feature-icon">🔍</span>
-                            <span class="feature-text">Parameter Search</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">📋</span>
-                            <span class="feature-text">Parameter Audit</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">👥</span>
-                            <span class="feature-text">Site Query</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">📖</span>
-                            <span class="feature-text">Knowledge Base</span>
-                        </div>
-                    </div>
+        <main class="documentation-container">
+            <div class="welcome-section">
+                <h2>Welcome to the Documentation Hub</h2>
+                <p>Access comprehensive RF engineering documentation, parameter management, and collaborative tools.</p>
+            </div>
+
+            <div class="features-grid">
+                <!-- Parameter Search Card -->
+                <div class="feature-card" onclick="window.location.href='/parameter-search'">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Parameter Search</h3>
+                    <p>Search and filter RF parameters across all network configurations and documentation.</p>
+                    <div class="feature-status active">Active</div>
+                    <div class="feature-arrow">→</div>
                 </div>
 
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 20%"></div>
-                    </div>
-                    <p class="progress-text">Development Progress: 20%</p>
+                <!-- Parameter Audit Card -->
+                <div class="feature-card" onclick="window.location.href='/parameter-audit'">
+                    <div class="feature-icon">📋</div>
+                    <h3>Parameter Audit</h3>
+                    <p>Comprehensive audit tools for RF parameters with compliance checking and reporting.</p>
+                    <div class="feature-status active">Active</div>
+                    <div class="feature-arrow">→</div>
                 </div>
 
-                <div class="estimated-launch">
-                    <p>Estimated Launch: <strong>Q4 2025</strong></p>
+                <!-- Site Query Card -->
+                <div class="feature-card" onclick="window.location.href='https://patrick5043.wixsite.com/unlidataanalytics'">
+                    <div class="feature-icon">👥</div>
+                    <h3>Site Query</h3>
+                    <p>External search and query tools for site-specific information and resources.</p>
+                    <div class="feature-status external">External</div>
+                    <div class="feature-arrow">→</div>
+                </div>
+
+                <!-- Knowledge Base Card -->
+                <div class="feature-card" onclick="window.location.href='/knowledge-base'">
+                    <div class="feature-icon">📖</div>
+                    <h3>Knowledge Base</h3>
+                    <p>Comprehensive knowledge repository with AI-powered search and documentation.</p>
+                    <div class="feature-status active">Active</div>
+                    <div class="feature-arrow">→</div>
+                </div>
+
+                <!-- Technical Specifications Card -->
+                <div class="feature-card" onclick="window.location.href='/technical-specs'">
+                    <div class="feature-icon">⚙️</div>
+                    <h3>Technical Specifications</h3>
+                    <p>Detailed technical specifications and requirements for RF equipment and configurations.</p>
+                    <div class="feature-status active">Active</div>
+                    <div class="feature-arrow">→</div>
+                </div>
+
+                <!-- Best Practices Card -->
+                <div class="feature-card" onclick="window.location.href='/best-practices'">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Best Practices</h3>
+                    <p>Industry best practices and guidelines for RF engineering and network optimization.</p>
+                    <div class="feature-status active">Active</div>
+                    <div class="feature-arrow">→</div>
+                </div>
+
+                <!-- Troubleshooting Guide Card -->
+                <div class="feature-card" onclick="window.location.href='/troubleshooting-guide'">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Troubleshooting Guide</h3>
+                    <p>Step-by-step troubleshooting guides for common RF engineering issues.</p>
+                    <div class="feature-status active">Active</div>
+                    <div class="feature-arrow">→</div>
+                </div>
+
+                <!-- Training Resources Card -->
+                <div class="feature-card" onclick="window.location.href='/training-resources'">
+                    <div class="feature-icon">🎓</div>
+                    <h3>Training Resources</h3>
+                    <p>Training materials, tutorials, and educational content for RF engineering teams.</p>
+                    <div class="feature-status active">Active</div>
+                    <div class="feature-arrow">→</div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Active Features</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Availability</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Secure Access</div>
                 </div>
             </div>
         </main>
 
         <footer class="footer">
-            <p>Powered by T-Mobile RF Engineering • Documentation Hub • Coming Soon</p>
+            <p>Powered by T-Mobile RF Engineering • Documentation Hub • Active</p>
         </footer>
     </div>
 </body>

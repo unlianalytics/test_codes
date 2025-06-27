@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Specifications - T-Mobile Documentation Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/documentation_hub.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="tmobile-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='/tmo_logo.png') }}" alt="T-Mobile Logo" class="logo-image">
+                </div>
+            </div>
+            <div class="header-navigation">
+                <a href="/documentation-hub" class="back-button">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Back to Hub</span>
+                </a>
+            </div>
+            <h1>Technical Specifications</h1>
+            <p class="subtitle">Detailed technical specifications and requirements for RF equipment and configurations</p>
+        </header>
+
+        <main class="documentation-container">
+            <div class="specs-section">
+                <h2>Equipment Specifications</h2>
+                <div class="specs-grid">
+                    <div class="spec-card">
+                        <h3>eNodeB</h3>
+                        <div class="spec-details">
+                            <div class="spec-item">
+                                <span class="spec-label">Frequency Range:</span>
+                                <span class="spec-value">2.3 GHz - 2.7 GHz</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Output Power:</span>
+                                <span class="spec-value">20 W</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">VSWR:</span>
+                                <span class="spec-value">< 1.5:1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spec-card">
+                        <h3>gNodeB</h3>
+                        <div class="spec-details">
+                            <div class="spec-item">
+                                <span class="spec-label">Frequency Range:</span>
+                                <span class="spec-value">2.3 GHz - 2.7 GHz</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Output Power:</span>
+                                <span class="spec-value">20 W</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">VSWR:</span>
+                                <span class="spec-value">< 1.5:1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spec-card">
+                        <h3>BTS</h3>
+                        <div class="spec-details">
+                            <div class="spec-item">
+                                <span class="spec-label">Frequency Range:</span>
+                                <span class="spec-value">2.3 GHz - 2.7 GHz</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Output Power:</span>
+                                <span class="spec-value">20 W</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">VSWR:</span>
+                                <span class="spec-value">< 1.5:1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spec-card">
+                        <h3>RNC</h3>
+                        <div class="spec-details">
+                            <div class="spec-item">
+                                <span class="spec-label">Frequency Range:</span>
+                                <span class="spec-value">2.3 GHz - 2.7 GHz</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Output Power:</span>
+                                <span class="spec-value">20 W</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">VSWR:</span>
+                                <span class="spec-value">< 1.5:1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="specs-notes">
+                <h2>Notes & References</h2>
+                <ul>
+                    <li>All specifications are based on T-Mobile and 3GPP standards.</li>
+                    <li>For detailed datasheets, refer to the equipment vendor documentation.</li>
+                    <li>Contact the RF Engineering team for custom requirements.</li>
+                </ul>
+            </div>
+        </main>
+    
+        <footer class="footer">
+            <p>Powered by T-Mobile RF Engineering • Technical Specifications • Active</p>
+        </footer>
+    </div>
+</body>
+</html> 

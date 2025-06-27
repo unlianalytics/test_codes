@@ -129,10 +129,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const avatar = sender === 'bot' ? '🤠' : '👤';
         const avatarClass = sender === 'bot' ? 'bot-avatar' : 'user-avatar';
         
+        // For bot messages, allow HTML content; for user messages, escape HTML
+        const messageContent = sender === 'bot' ? text : escapeHtml(text);
+        
         messageDiv.innerHTML = `
             <div class="message-content">
                 <div class="${avatarClass}">${avatar}</div>
-                <div class="message-text">${escapeHtml(text)}</div>
+                <div class="message-text">${messageContent}</div>
             </div>
         `;
         

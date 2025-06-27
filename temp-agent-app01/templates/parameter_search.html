@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parameter Search - T-Mobile Documentation Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/documentation_hub.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="tmobile-logo">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', path='/tmo_logo.png') }}" alt="T-Mobile Logo" class="logo-image">
+                </div>
+            </div>
+            <div class="header-navigation">
+                <a href="/documentation-hub" class="back-button">
+                    <span class="back-icon">←</span>
+                    <span class="back-text">Back to Hub</span>
+                </a>
+            </div>
+            <h1>Parameter Search</h1>
+            <p class="subtitle">Search and filter RF parameters across all network configurations</p>
+        </header>
+
+        <main class="documentation-container">
+            <div class="search-section">
+                <div class="search-box">
+                    <input type="text" id="parameterSearch" placeholder="Search for RF parameters..." class="search-input">
+                    <button class="search-button">🔍 Search</button>
+                </div>
+                
+                <div class="filter-section">
+                    <select class="filter-select">
+                        <option value="">All Categories</option>
+                        <option value="lte">LTE Parameters</option>
+                        <option value="nr">NR Parameters</option>
+                        <option value="gsm">GSM Parameters</option>
+                        <option value="umts">UMTS Parameters</option>
+                    </select>
+                    
+                    <select class="filter-select">
+                        <option value="">All Equipment</option>
+                        <option value="enb">eNodeB</option>
+                        <option value="gnb">gNodeB</option>
+                        <option value="bts">BTS</option>
+                        <option value="rnc">RNC</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2>Search Results</h2>
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>RSRP Threshold</h3>
+                        <p class="parameter-category">LTE • Signal Quality</p>
+                        <p class="parameter-description">Reference Signal Received Power threshold for handover decisions.</p>
+                        <div class="parameter-details">
+                            <span class="detail">Range: -140 to -44 dBm</span>
+                            <span class="detail">Default: -120 dBm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>SINR Target</h3>
+                        <p class="parameter-category">LTE • Signal Quality</p>
+                        <p class="parameter-description">Signal to Interference plus Noise Ratio target for optimization.</p>
+                        <div class="parameter-details">
+                            <span class="detail">Range: -10 to 30 dB</span>
+                            <span class="detail">Default: 15 dB</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <h3>Handover Margin</h3>
+                        <p class="parameter-category">LTE • Mobility</p>
+                        <p class="parameter-description">Hysteresis margin for handover decisions to prevent ping-pong.</p>
+                        <div class="parameter-details">
+                            <span class="detail">Range: 0 to 20 dB</span>
+                            <span class="detail">Default: 3 dB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by T-Mobile RF Engineering • Parameter Search • Active</p>
+        </footer>
+    </div>
+</body>
+</html> 

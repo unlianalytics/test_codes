@@ -888,4 +888,65 @@ body {
     margin: 8px 0;
     font-weight: 600;
     color: var(--texas-dark);
+}
+
+/* Thinking message styling */
+.thinking-message {
+    opacity: 0.9;
+}
+
+.thinking-text {
+    font-style: italic;
+    color: #666;
+}
+
+/* Animated dots */
+.thinking-dots {
+    display: inline-block;
+    margin-left: 4px;
+}
+
+.thinking-dots .dot {
+    display: inline-block;
+    animation: dotAnimation 1.4s infinite;
+    font-size: 18px;
+    font-weight: bold;
+    color: #e20074;
+}
+
+.thinking-dots .dot:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.thinking-dots .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.thinking-dots .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dotAnimation {
+    0%, 80%, 100% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+/* Bot avatar for thinking state */
+.thinking-message .bot-avatar {
+    animation: thinkingPulse 2s infinite;
+}
+
+@keyframes thinkingPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
 } 

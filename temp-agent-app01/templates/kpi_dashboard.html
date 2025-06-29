@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KPI Dashboard - T-Mobile Multi-App Platform</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/maintenance.css') }}">
+    <title>KPI Dashboard - T-Mobile RF Engineering</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/kpi_dashboard.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -22,56 +23,222 @@
                 </a>
             </div>
             <h1>KPI Dashboard</h1>
-            <p class="subtitle">Real-time KPI monitoring and reporting dashboard for network performance</p>
+            <p class="subtitle">Real-time network performance monitoring and analytics</p>
+            <div class="dashboard-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">📊</span>
+                    <span class="stat-label">Active KPIs</span>
+                    <span class="stat-value" id="activeKpis">6</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">⚡</span>
+                    <span class="stat-label">Last Update</span>
+                    <span class="stat-value" id="lastUpdate">Just now</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">📈</span>
+                    <span class="stat-label">Data Points</span>
+                    <span class="stat-value" id="dataPoints">Loading...</span>
+                </div>
+            </div>
         </header>
 
-        <main class="maintenance-container">
-            <div class="maintenance-card">
-                <div class="maintenance-icon">📈</div>
-                <h2>Under Maintenance</h2>
-                <p class="maintenance-message">
-                    We're building the KPI Dashboard to provide real-time monitoring, 
-                    custom reporting, and alert systems for comprehensive network performance tracking.
-                </p>
-                
-                <div class="features-preview">
-                    <h3>Coming Features:</h3>
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <span class="feature-icon">⚡</span>
-                            <span class="feature-text">Real-time Data Monitoring</span>
+        <main class="dashboard-container">
+            <!-- KPI Categories Grid -->
+            <div class="kpi-grid" id="kpiGrid">
+                <!-- Signal Quality Card -->
+                <div class="kpi-card" data-category="signal-quality">
+                    <div class="card-header">
+                        <div class="card-icon">📶</div>
+                        <h3>Signal Quality</h3>
+                        <div class="card-status good">Good</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-row">
+                            <span class="metric-label">RSRP</span>
+                            <span class="metric-value" id="rsrp-value">-85 dBm</span>
                         </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">📊</span>
-                            <span class="feature-text">Custom Report Generation</span>
+                        <div class="metric-row">
+                            <span class="metric-label">SINR</span>
+                            <span class="metric-value" id="sinr-value">18.5 dB</span>
                         </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">🔔</span>
-                            <span class="feature-text">Smart Alert System</span>
+                        <div class="metric-row">
+                            <span class="metric-label">RSRQ</span>
+                            <span class="metric-value" id="rsrq-value">-8.2 dB</span>
                         </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">📱</span>
-                            <span class="feature-text">Mobile Dashboard Access</span>
-                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="view-details-btn" onclick="showKpiDetails('signal-quality')">
+                            View Details
+                        </button>
                     </div>
                 </div>
 
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 45%"></div>
+                <!-- Coverage Card -->
+                <div class="kpi-card" data-category="coverage">
+                    <div class="card-header">
+                        <div class="card-icon">🌐</div>
+                        <h3>Coverage</h3>
+                        <div class="card-status excellent">Excellent</div>
                     </div>
-                    <p class="progress-text">Development Progress: 45%</p>
+                    <div class="card-content">
+                        <div class="metric-row">
+                            <span class="metric-label">Coverage Area</span>
+                            <span class="metric-value" id="coverage-area">98.5%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Avg Distance</span>
+                            <span class="metric-value" id="avg-distance">1.2 km</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Cell Range</span>
+                            <span class="metric-value" id="cell-range">2.8 km</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="view-details-btn" onclick="showKpiDetails('coverage')">
+                            View Details
+                        </button>
+                    </div>
                 </div>
 
-                <div class="estimated-launch">
-                    <p>Estimated Launch: <strong>Q2 2025</strong></p>
+                <!-- Throughput Card -->
+                <div class="kpi-card" data-category="throughput">
+                    <div class="card-header">
+                        <div class="card-icon">🚀</div>
+                        <h3>Throughput</h3>
+                        <div class="card-status good">Good</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-row">
+                            <span class="metric-label">Avg Speed</span>
+                            <span class="metric-value" id="avg-speed">45.2 Mbps</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Peak Speed</span>
+                            <span class="metric-value" id="peak-speed">78.9 Mbps</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Bandwidth</span>
+                            <span class="metric-value" id="bandwidth">20 MHz</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="view-details-btn" onclick="showKpiDetails('throughput')">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interference Card -->
+                <div class="kpi-card" data-category="interference">
+                    <div class="card-header">
+                        <div class="card-icon">🔇</div>
+                        <h3>Interference</h3>
+                        <div class="card-status warning">Warning</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-row">
+                            <span class="metric-label">Interference Ratio</span>
+                            <span class="metric-value" id="interference-ratio">12.3%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Noise Floor</span>
+                            <span class="metric-value" id="noise-floor">-95 dBm</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">SIR</span>
+                            <span class="metric-value" id="sir-value">15.2 dB</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="view-details-btn" onclick="showKpiDetails('interference')">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobility Card -->
+                <div class="kpi-card" data-category="mobility">
+                    <div class="card-header">
+                        <div class="card-icon">🔄</div>
+                        <h3>Mobility</h3>
+                        <div class="card-status excellent">Excellent</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-row">
+                            <span class="metric-label">Handover Success</span>
+                            <span class="metric-value" id="handover-success">99.2%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Location Updates</span>
+                            <span class="metric-value" id="location-updates">1,245/hr</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Cell Changes</span>
+                            <span class="metric-value" id="cell-changes">89/hr</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="view-details-btn" onclick="showKpiDetails('mobility')">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Capacity Card -->
+                <div class="kpi-card" data-category="capacity">
+                    <div class="card-header">
+                        <div class="card-icon">⚡</div>
+                        <h3>Capacity</h3>
+                        <div class="card-status good">Good</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="metric-row">
+                            <span class="metric-label">Load</span>
+                            <span class="metric-value" id="load-value">67.8%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Utilization</span>
+                            <span class="metric-value" id="utilization">72.3%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Congestion</span>
+                            <span class="metric-value" id="congestion">8.5%</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="view-details-btn" onclick="showKpiDetails('capacity')">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Details Modal -->
+            <div class="modal-overlay" id="kpiModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="modalTitle">KPI Details</h2>
+                        <button class="close-btn" onclick="closeKpiModal()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="chart-container">
+                            <canvas id="kpiChart"></canvas>
+                        </div>
+                        <div class="kpi-details" id="kpiDetails">
+                            <!-- Details will be populated dynamically -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
 
         <footer class="footer">
-            <p>Powered by T-Mobile RF Engineering • KPI Dashboard • Coming Soon</p>
+            <p>Powered by T-Mobile RF Engineering • KPI Dashboard • Active</p>
         </footer>
     </div>
+
+    <script src="{{ url_for('static', path='/kpi_dashboard.js') }}"></script>
 </body>
 </html> 

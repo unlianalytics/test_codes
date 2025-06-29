@@ -63,6 +63,7 @@ except:
 # File Discovery Configuration
 PDF_DIRECTORY = r"C:\Users\magno\Downloads\pdf_files"  # Directory containing PDFs
 CSV_DIRECTORY = r"C:\Users\magno\Downloads\csv_metrics"  # Directory containing CSV metrics
+CSV_FALLBACK_DIRECTORY = "csv_files"  # Fallback directory for local CSV files
 CACHE_DIRECTORY = r"C:\Users\magno\Downloads\agent_cache"  # Cache directory for processed data
 AUTO_LOAD_PDFS = True  # Set to True for automatic PDF discovery
 AUTO_LOAD_CSVS = True  # Set to True for automatic CSV discovery
@@ -84,6 +85,7 @@ ENABLE_RERANKING = True   # Enable result reranking
 # Add this to the configuration section
 FORCE_RELOAD_ON_STARTUP = True  # Set to True to force reload all files on startup
 CHECK_EMPTY_KB_ON_STARTUP = True  # Set to True to check if KB is empty and reload if needed
+USE_FALLBACK_CSV = True  # Use fallback CSV directory if main directory is empty
 
 # ===== END CONFIGURATION =====
 
@@ -656,10 +658,17 @@ def initialize_knowledge_base_enhanced():
         else:
             logger.warning(f"No PDF files found in {PDF_DIRECTORY}")
     
-    # Process CSV files
+    # Process CSV files with fallback logic
     if AUTO_LOAD_CSVS:
         logger.info(f"📊 Processing CSV files from: {CSV_DIRECTORY}")
         csv_files = get_csv_files_from_directory(CSV_DIRECTORY)
+        
+        # If no CSV files found in main directory and fallback is enabled, try fallback directory
+        if not csv_files and USE_FALLBACK_CSV:
+            logger.info(f"No CSV files found in main directory, trying fallback: {CSV_FALLBACK_DIRECTORY}")
+            csv_files = get_csv_files_from_directory(CSV_FALLBACK_DIRECTORY)
+            if csv_files:
+                logger.info(f"✅ Found {len(csv_files)} CSV files in fallback directory")
         
         if csv_files:
             logger.info(f"Found {len(csv_files)} CSV files")
@@ -693,7 +702,7 @@ def initialize_knowledge_base_enhanced():
                     except Exception as e:
                         logger.error(f"❌ Error processing {source_name}: {e}")
         else:
-            logger.warning(f"No CSV files found in {CSV_DIRECTORY}")
+            logger.warning(f"No CSV files found in either {CSV_DIRECTORY} or {CSV_FALLBACK_DIRECTORY}")
     
     # Add chunks to knowledge base
     if all_chunks:
@@ -1112,6 +1121,57 @@ def api_nrpar_parameter_details(abbreviated_name: str = "", managed_object: str 
         filtered = filtered[filtered['Managed object'].str.strip() == managed_object.strip()]
     details = filtered.fillna("").to_dict(orient='records')
     return JSONResponse({ 'details': details })
+
+@app.get("/test-chat")
+async def test_chat():
+    """Simple test endpoint to verify chat functionality"""
+    try:
+        kb_count = knowledge_collection.count()
+        return {
+            "status": "success",
+            "message": "Chat endpoint is working!",
+            "timestamp": datetime.now().isoformat(),
+            "knowledge_chunks": kb_count,
+            "openai_key_set": bool(os.getenv("OPENAI_API_KEY")),
+            "openai_key_length": len(os.getenv("OPENAI_API_KEY", ""))
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Error: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }
+
+@app.post("/simple-chat")
+async def simple_chat(message: str = Form(...)):
+    """Simple chat without RAG for testing"""
+    try:
+        # Simple response without knowledge base
+        system_prompt = """You are a helpful AI assistant specialized in RF engineering and network performance analysis. 
+        You can help with general RF engineering questions and network optimization concepts."""
+        
+        response = client.chat.completions.create(
+            model="gpt-4",
+            max_tokens=500,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ],
+            temperature=0.3
+        )
+        
+        return {
+            "response": response.choices[0].message.content,
+            "rag_metrics": {
+                "documents_retrieved": 0,
+                "average_relevance": 0,
+                "response_time_seconds": 0
+            }
+        }
+    
+    except Exception as e:
+        logger.error(f"Error in simple chat: {e}")
+        return {"response": f"Sorry, I'm having some technical difficulties: {str(e)}"}
 
 if __name__ == "__main__":
     import uvicorn

@@ -2,7 +2,7 @@
 # This version focuses on improved RAG performance and better knowledge base utilization
 
 from fastapi import FastAPI, Request, Form, BackgroundTasks
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from openai import OpenAI
@@ -25,6 +25,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import time
 import logging
+import threading
 warnings.filterwarnings('ignore')
 
 # Configure logging
@@ -47,34 +48,6 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "your-openai-api-key-here"))
 
 # OpenAI embedding model configuration
 EMBEDDING_MODEL = "text-embedding-ada-002"  # OpenAI's embedding model
-
-# Function to generate embeddings using OpenAI
-def generate_embeddings(texts: List[str]) -> List[List[float]]:
-    """Generate embeddings using OpenAI's embedding model with enhanced error handling"""
-    try:
-        if isinstance(texts, str):
-            texts = [texts]
-        
-        # Clean and prepare texts
-        cleaned_texts = []
-        for text in texts:
-            # Truncate text if it's too long (OpenAI has a limit)
-            if len(text) > 8000:  # OpenAI's limit is 8192 tokens, but we'll be conservative
-                text = text[:8000]
-            cleaned_texts.append(text)
-        
-        # Generate embeddings
-        response = client.embeddings.create(
-            model=EMBEDDING_MODEL,
-            input=cleaned_texts
-        )
-        
-        # Extract embeddings
-        embeddings = [data.embedding for data in response.data]
-        return embeddings
-    except Exception as e:
-        logger.error(f"Error generating embeddings: {e}")
-        return []
 
 # Initialize ChromaDB for vector storage
 chroma_client = chromadb.Client()
@@ -108,7 +81,32 @@ MAX_CONTEXT_LENGTH = 4000  # Maximum context length for LLM
 ENABLE_HYBRID_SEARCH = True  # Enable hybrid search (semantic + keyword)
 ENABLE_RERANKING = True   # Enable result reranking
 
+# Add this to the configuration section
+FORCE_RELOAD_ON_STARTUP = True  # Set to True to force reload all files on startup
+CHECK_EMPTY_KB_ON_STARTUP = True  # Set to True to check if KB is empty and reload if needed
+
 # ===== END CONFIGURATION =====
+
+# Generate embeddings function
+def generate_embeddings(texts: List[str]) -> List[List[float]]:
+    """Generate embeddings for a list of texts using OpenAI's embedding model"""
+    try:
+        if not texts:
+            return []
+        
+        # Generate embeddings using OpenAI
+        response = client.embeddings.create(
+            model=EMBEDDING_MODEL,
+            input=texts
+        )
+        
+        # Extract embeddings from response
+        embeddings = [data.embedding for data in response.data]
+        return embeddings
+        
+    except Exception as e:
+        logger.error(f"Error generating embeddings: {e}")
+        return []
 
 # Enhanced file tracking for incremental processing
 class EnhancedFileTracker:
@@ -435,7 +433,7 @@ def add_to_knowledge_base_enhanced(chunks: List[Dict]):
             # Generate embeddings
             embeddings = generate_embeddings(texts)
             
-            if embeddings:
+            if embeddings and len(embeddings) == len(texts):
                 # Add to ChromaDB
                 knowledge_collection.add(
                     embeddings=embeddings,
@@ -445,7 +443,7 @@ def add_to_knowledge_base_enhanced(chunks: List[Dict]):
                 )
                 logger.info(f"Added batch {i//BATCH_SIZE + 1} with {len(batch)} chunks")
             else:
-                logger.error(f"Failed to generate embeddings for batch {i//BATCH_SIZE + 1}")
+                logger.error(f"Failed to generate embeddings for batch {i//BATCH_SIZE + 1} - expected {len(texts)}, got {len(embeddings) if embeddings else 0}")
         
         return True
     except Exception as e:
@@ -457,11 +455,13 @@ def search_knowledge_base_enhanced(query: str, top_k: int = 8) -> List[Dict]:
     """Enhanced search with multiple retrieval methods and reranking"""
     try:
         # Generate query embedding
-        query_embedding = generate_embeddings([query])[0]
+        embeddings = generate_embeddings([query])
         
-        if not query_embedding:
+        if not embeddings or len(embeddings) == 0:
             logger.error("Failed to generate query embedding")
             return []
+        
+        query_embedding = embeddings[0]
         
         # Search in ChromaDB with more results for reranking
         results = knowledge_collection.query(
@@ -593,6 +593,24 @@ def process_file_parallel(file_path: str, file_type: str, source_name: str) -> L
 def initialize_knowledge_base_enhanced():
     """Initialize knowledge base with enhanced processing"""
     logger.info("🚀 Initializing Enhanced T-Mobile RF AI Agent Knowledge Base...")
+    
+    # Check if we should force reload
+    if FORCE_RELOAD_ON_STARTUP:
+        logger.info("🔄 Force reload enabled - processing all files")
+        # Clear the file tracker to force reprocessing
+        file_tracker.processed_files = {}
+        file_tracker.save_tracker()
+    
+    # Check if knowledge base is empty and reload if needed
+    if CHECK_EMPTY_KB_ON_STARTUP:
+        current_count = knowledge_collection.count()
+        if current_count == 0:
+            logger.info("📚 Knowledge base is empty - forcing reload of all files")
+            # Clear the file tracker to force reprocessing
+            file_tracker.processed_files = {}
+            file_tracker.save_tracker()
+        else:
+            logger.info(f"📚 Knowledge base contains {current_count} chunks")
     
     all_chunks = []
     processed_files = []
@@ -1004,6 +1022,96 @@ async def training_resources(request: Request):
 async def startup_event():
     """Initialize enhanced knowledge base on startup"""
     initialize_knowledge_base_enhanced()
+
+# LTE CSV path and cache
+lte_csv_path = 'csv_files/Parameters_LTE.csv'
+lte_csv_cache = None
+lte_csv_lock = threading.Lock()
+
+def get_lte_csv():
+    global lte_csv_cache
+    with lte_csv_lock:
+        if lte_csv_cache is None:
+            lte_csv_cache = pd.read_csv(lte_csv_path, dtype=str, encoding='latin1').fillna("")
+        return lte_csv_cache
+
+# NR CSV path and cache
+nr_csv_path = 'csv_files/Parameters_NR.csv'
+nr_csv_cache = None
+nr_csv_lock = threading.Lock()
+
+def get_nr_csv():
+    global nr_csv_cache
+    with nr_csv_lock:
+        if nr_csv_cache is None:
+            nr_csv_cache = pd.read_csv(nr_csv_path, dtype=str, encoding='latin1').fillna("")
+        return nr_csv_cache
+
+# Autocomplete endpoints for abbreviated names
+@app.get('/api/ltepar-abbreviated-autocomplete')
+def api_ltepar_abbreviated_autocomplete(query: str = ""):
+    """Get abbreviated names for LTE parameters matching the query"""
+    df = get_lte_csv()
+    if query:
+        mask = df['Abbreviated name'].str.lower().str.contains(query.strip().lower(), na=False)
+        names = sorted(df.loc[mask, 'Abbreviated name'].dropna().unique())
+    else:
+        names = sorted(df['Abbreviated name'].dropna().unique())
+    return JSONResponse({'abbreviated_names': names})
+
+@app.get('/api/nrpar-abbreviated-autocomplete')
+def api_nrpar_abbreviated_autocomplete(query: str = ""):
+    """Get abbreviated names for NR parameters matching the query"""
+    df = get_nr_csv()
+    if query:
+        mask = df['Abbreviated name'].str.lower().str.contains(query.strip().lower(), na=False)
+        names = sorted(df.loc[mask, 'Abbreviated name'].dropna().unique())
+    else:
+        names = sorted(df['Abbreviated name'].dropna().unique())
+    return JSONResponse({'abbreviated_names': names})
+
+# Existing LTE endpoints (if not already present)
+@app.get('/api/ltepar-search-managed-objects')
+def api_ltepar_search_managed_objects(abbreviated_name: str = ""):
+    df = get_lte_csv()
+    if abbreviated_name:
+        filtered = df[df['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
+    else:
+        filtered = df
+    managed_objects = sorted(filtered['Managed object'].dropna().unique())
+    return JSONResponse({ 'managed_objects': managed_objects })
+
+@app.get('/api/ltepar-parameter-details')
+def api_ltepar_parameter_details(abbreviated_name: str = "", managed_object: str = ""):
+    df = get_lte_csv()
+    filtered = df
+    if abbreviated_name:
+        filtered = filtered[filtered['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
+    if managed_object:
+        filtered = filtered[filtered['Managed object'].str.strip() == managed_object.strip()]
+    details = filtered.fillna("").to_dict(orient='records')
+    return JSONResponse({ 'details': details })
+
+@app.get('/api/nrpar-search-managed-objects')
+def api_nrpar_search_managed_objects(abbreviated_name: str = ""):
+    df = get_nr_csv()
+    if abbreviated_name:
+        filtered = df[df['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
+    else:
+        filtered = df
+    managed_objects = sorted(filtered['Managed object'].dropna().unique())
+    return JSONResponse({ 'managed_objects': managed_objects })
+
+@app.get('/api/nrpar-parameter-details')
+def api_nrpar_parameter_details(abbreviated_name: str = "", managed_object: str = ""):
+    df = get_nr_csv()
+    filtered = df
+    if abbreviated_name:
+        filtered = filtered[filtered['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
+    if managed_object:
+        filtered = filtered[filtered['Managed object'].str.strip() == managed_object.strip()]
+    details = filtered.fillna("").to_dict(orient='records')
+    return JSONResponse({ 'details': details })
 
 if __name__ == "__main__":
     import uvicorn

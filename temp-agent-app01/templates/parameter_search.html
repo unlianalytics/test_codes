@@ -26,70 +26,58 @@
         </header>
 
         <main class="documentation-container">
-            <div class="search-section">
-                <div class="search-box">
-                    <input type="text" id="parameterSearch" placeholder="Search for RF parameters..." class="search-input">
-                    <button class="search-button">🔍 Search</button>
+            <div class="tab-container">
+                <div class="tab-navigation">
+                    <button class="tab-button active lte-parameters-tab" data-tab="ltepar">LTE parameters</button>
+                    <button class="tab-button nr-parameters-tab" data-tab="nrpar">NR parameters</button>
                 </div>
-                
-                <div class="filter-section">
-                    <select class="filter-select">
-                        <option value="">All Categories</option>
-                        <option value="lte">LTE Parameters</option>
-                        <option value="nr">NR Parameters</option>
-                        <option value="gsm">GSM Parameters</option>
-                        <option value="umts">UMTS Parameters</option>
-                    </select>
-                    
-                    <select class="filter-select">
-                        <option value="">All Equipment</option>
-                        <option value="enb">eNodeB</option>
-                        <option value="gnb">gNodeB</option>
-                        <option value="bts">BTS</option>
-                        <option value="rnc">RNC</option>
-                    </select>
-                </div>
-            </div>
 
-            <div class="results-section">
-                <h2>Search Results</h2>
-                <div class="results-grid">
-                    <div class="result-card">
-                        <h3>RSRP Threshold</h3>
-                        <p class="parameter-category">LTE • Signal Quality</p>
-                        <p class="parameter-description">Reference Signal Received Power threshold for handover decisions.</p>
-                        <div class="parameter-details">
-                            <span class="detail">Range: -140 to -44 dBm</span>
-                            <span class="detail">Default: -120 dBm</span>
+                <div class="tab-content-container">
+                    <!-- LTE parameters Tab Content -->
+                    <div class="tab-content active" id="ltepar-content" role="tabpanel" aria-labelledby="ltepar-tab">
+                        <div class="search-section">
+                            <div class="search-filter-container">
+                                <div class="search-row">
+                                    <input type="text" id="lteparSearchInput" placeholder="Enter parameter name (Abbreviated name)..." class="search-input">
+                                    <button class="search-button" id="lteparSearchButton">🔍 Search</button>
+                                </div>
+                                <div class="filter-row">
+                                    <select class="filter-select" id="lteparSearchManagedObjectFilter">
+                                        <option value="">Select Managed Object</option>
+                                    </select>
+                                </div>
+                                <div id="lteparParameterDetails" class="parameter-details-form"></div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="result-card">
-                        <h3>SINR Target</h3>
-                        <p class="parameter-category">LTE • Signal Quality</p>
-                        <p class="parameter-description">Signal to Interference plus Noise Ratio target for optimization.</p>
-                        <div class="parameter-details">
-                            <span class="detail">Range: -10 to 30 dB</span>
-                            <span class="detail">Default: 15 dB</span>
+
+                    <!-- NR parameters Tab Content -->
+                    <div class="tab-content" id="nrpar-content" role="tabpanel" aria-labelledby="nrpar-tab" style="display: none;">
+                        <div class="search-section">
+                            <div class="search-filter-container">
+                                <div class="search-row">
+                                    <input type="text" id="nrparSearchInput" placeholder="Enter parameter name (Abbreviated name)..." class="search-input">
+                                    <button class="search-button" id="nrparSearchButton">🔍 Search</button>
+                                </div>
+                                <div class="filter-row">
+                                    <select class="filter-select" id="nrparSearchManagedObjectFilter">
+                                        <option value="">Select Managed Object</option>
+                                    </select>
+                                </div>
+                                <div id="nrparParameterDetails" class="parameter-details-form"></div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="result-card">
-                        <h3>Handover Margin</h3>
-                        <p class="parameter-category">LTE • Mobility</p>
-                        <p class="parameter-description">Hysteresis margin for handover decisions to prevent ping-pong.</p>
-                        <div class="parameter-details">
-                            <span class="detail">Range: 0 to 20 dB</span>
-                            <span class="detail">Default: 3 dB</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </div> <!-- End Tab Content Container -->
+            </div> <!-- End Tab Container -->
         </main>
 
         <footer class="footer">
             <p>Powered by T-Mobile RF Engineering • Parameter Search • Active</p>
         </footer>
     </div>
+
+    <!-- Only this script tag should be present -->
+    <script src="{{ url_for('static', path='/script.js') }}"></script>
 </body>
 </html> 

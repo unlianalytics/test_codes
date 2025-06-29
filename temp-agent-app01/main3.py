@@ -1041,7 +1041,37 @@ def get_lte_csv():
     global lte_csv_cache
     with lte_csv_lock:
         if lte_csv_cache is None:
-            lte_csv_cache = pd.read_csv(lte_csv_path, dtype=str, encoding='latin1').fillna("")
+            try:
+                # Try different encodings and clean column names
+                lte_csv_cache = pd.read_csv(lte_csv_path, dtype=str, encoding='latin1')
+                
+                # Clean column names - remove extra spaces and normalize
+                lte_csv_cache.columns = lte_csv_cache.columns.str.strip()
+                
+                # Handle common column name variations
+                column_mapping = {
+                    'abbreviated name': 'Abbreviated name',
+                    'abbreviated_name': 'Abbreviated name',
+                    'managed object': 'Managed object',
+                    'managed_object': 'Managed object',
+                    'managedobject': 'Managed object'
+                }
+                
+                # Apply column mapping
+                for old_name, new_name in column_mapping.items():
+                    if old_name in lte_csv_cache.columns:
+                        lte_csv_cache = lte_csv_cache.rename(columns={old_name: new_name})
+                
+                # Fill NaN values
+                lte_csv_cache = lte_csv_cache.fillna("")
+                
+                print(f"[DEBUG] LTE CSV loaded successfully. Columns: {list(lte_csv_cache.columns)}")
+                
+            except Exception as e:
+                print(f"[ERROR] Failed to load LTE CSV: {e}")
+                # Return empty DataFrame with expected columns
+                lte_csv_cache = pd.DataFrame(columns=['Abbreviated name', 'Managed object'])
+        
         return lte_csv_cache
 
 # NR CSV path and cache
@@ -1053,7 +1083,37 @@ def get_nr_csv():
     global nr_csv_cache
     with nr_csv_lock:
         if nr_csv_cache is None:
-            nr_csv_cache = pd.read_csv(nr_csv_path, dtype=str, encoding='latin1').fillna("")
+            try:
+                # Try different encodings and clean column names
+                nr_csv_cache = pd.read_csv(nr_csv_path, dtype=str, encoding='latin1')
+                
+                # Clean column names - remove extra spaces and normalize
+                nr_csv_cache.columns = nr_csv_cache.columns.str.strip()
+                
+                # Handle common column name variations
+                column_mapping = {
+                    'abbreviated name': 'Abbreviated name',
+                    'abbreviated_name': 'Abbreviated name',
+                    'managed object': 'Managed object',
+                    'managed_object': 'Managed object',
+                    'managedobject': 'Managed object'
+                }
+                
+                # Apply column mapping
+                for old_name, new_name in column_mapping.items():
+                    if old_name in nr_csv_cache.columns:
+                        nr_csv_cache = nr_csv_cache.rename(columns={old_name: new_name})
+                
+                # Fill NaN values
+                nr_csv_cache = nr_csv_cache.fillna("")
+                
+                print(f"[DEBUG] NR CSV loaded successfully. Columns: {list(nr_csv_cache.columns)}")
+                
+            except Exception as e:
+                print(f"[ERROR] Failed to load NR CSV: {e}")
+                # Return empty DataFrame with expected columns
+                nr_csv_cache = pd.DataFrame(columns=['Abbreviated name', 'Managed object'])
+        
         return nr_csv_cache
 
 # Autocomplete endpoints for abbreviated names
@@ -1079,27 +1139,59 @@ def api_nrpar_abbreviated_autocomplete(query: str = ""):
         names = sorted(df['Abbreviated name'].dropna().unique())
     return JSONResponse({'abbreviated_names': names})
 
-# Existing LTE endpoints (if not already present)
+# Update the LTE endpoints with better error handling
 @app.get('/api/ltepar-search-managed-objects')
 def api_ltepar_search_managed_objects(abbreviated_name: str = ""):
-    df = get_lte_csv()
-    if abbreviated_name:
-        filtered = df[df['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
-    else:
-        filtered = df
-    managed_objects = sorted(filtered['Managed object'].dropna().unique())
-    return JSONResponse({ 'managed_objects': managed_objects })
+    try:
+        df = get_lte_csv()
+        print(f"[DEBUG] LTE CSV columns: {list(df.columns)}")
+        print(f"[DEBUG] Looking for abbreviated_name: '{abbreviated_name}'")
+        
+        if 'Abbreviated name' not in df.columns:
+            return JSONResponse({"error": f"Column 'Abbreviated name' not found. Available columns: {list(df.columns)}"})
+        
+        if 'Managed object' not in df.columns:
+            return JSONResponse({"error": f"Column 'Managed object' not found. Available columns: {list(df.columns)}"})
+        
+        if abbreviated_name:
+            filtered = df[df['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
+            print(f"[DEBUG] Found {len(filtered)} matching rows")
+        else:
+            filtered = df
+        
+        managed_objects = sorted(filtered['Managed object'].dropna().unique())
+        print(f"[DEBUG] Returning {len(managed_objects)} managed objects")
+        
+        return JSONResponse({ 'managed_objects': managed_objects })
+    except Exception as e:
+        print(f"[ERROR] LTE search error: {str(e)}")
+        return JSONResponse({"error": f"LTE search error: {str(e)}"})
 
 @app.get('/api/ltepar-parameter-details')
 def api_ltepar_parameter_details(abbreviated_name: str = "", managed_object: str = ""):
-    df = get_lte_csv()
-    filtered = df
-    if abbreviated_name:
-        filtered = filtered[filtered['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
-    if managed_object:
-        filtered = filtered[filtered['Managed object'].str.strip() == managed_object.strip()]
-    details = filtered.fillna("").to_dict(orient='records')
-    return JSONResponse({ 'details': details })
+    try:
+        df = get_lte_csv()
+        print(f"[DEBUG] LTE parameter details - abbreviated_name: '{abbreviated_name}', managed_object: '{managed_object}'")
+        
+        if 'Abbreviated name' not in df.columns:
+            return JSONResponse({"error": f"Column 'Abbreviated name' not found. Available columns: {list(df.columns)}"})
+        
+        if 'Managed object' not in df.columns:
+            return JSONResponse({"error": f"Column 'Managed object' not found. Available columns: {list(df.columns)}"})
+        
+        filtered = df
+        if abbreviated_name:
+            filtered = filtered[filtered['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
+        if managed_object:
+            filtered = filtered[filtered['Managed object'].str.strip() == managed_object.strip()]
+        
+        print(f"[DEBUG] Found {len(filtered)} matching rows")
+        details = filtered.fillna("").to_dict(orient='records')
+        
+        return JSONResponse({ 'details': details })
+    except Exception as e:
+        print(f"[ERROR] LTE parameter details error: {str(e)}")
+        return JSONResponse({"error": f"LTE parameter details error: {str(e)}"})
 
 @app.get('/api/nrpar-search-managed-objects')
 def api_nrpar_search_managed_objects(abbreviated_name: str = ""):
@@ -1172,6 +1264,108 @@ async def simple_chat(message: str = Form(...)):
     except Exception as e:
         logger.error(f"Error in simple chat: {e}")
         return {"response": f"Sorry, I'm having some technical difficulties: {str(e)}"}
+
+# Add this diagnostic endpoint to check CSV structure
+@app.get('/api/debug-csv-structure')
+def debug_csv_structure():
+    """Debug endpoint to check CSV column names and structure"""
+    try:
+        lte_df = get_lte_csv()
+        nr_df = get_nr_csv()
+        
+        return {
+            "lte_csv": {
+                "columns": list(lte_df.columns),
+                "shape": lte_df.shape,
+                "sample_abbreviated_names": lte_df['Abbreviated name'].dropna().head(5).tolist() if 'Abbreviated name' in lte_df.columns else "Column not found",
+                "sample_managed_objects": lte_df['Managed object'].dropna().head(5).tolist() if 'Managed object' in lte_df.columns else "Column not found",
+                "total_abbreviated_names": len(lte_df['Abbreviated name'].dropna().unique()) if 'Abbreviated name' in lte_df.columns else 0,
+                "total_managed_objects": len(lte_df['Managed object'].dropna().unique()) if 'Managed object' in lte_df.columns else 0
+            },
+            "nr_csv": {
+                "columns": list(nr_df.columns),
+                "shape": nr_df.shape,
+                "sample_abbreviated_names": nr_df['Abbreviated name'].dropna().head(5).tolist() if 'Abbreviated name' in nr_df.columns else "Column not found",
+                "sample_managed_objects": nr_df['Managed object'].dropna().head(5).tolist() if 'Managed object' in nr_df.columns else "Column not found",
+                "total_abbreviated_names": len(nr_df['Abbreviated name'].dropna().unique()) if 'Abbreviated name' in nr_df.columns else 0,
+                "total_managed_objects": len(nr_df['Managed object'].dropna().unique()) if 'Managed object' in nr_df.columns else 0
+            }
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get('/api/test-lte-search')
+def test_lte_search(abbreviated_name: str = ""):
+    """Test endpoint to debug LTE search issues"""
+    try:
+        df = get_lte_csv()
+        
+        # Check if CSV loaded properly
+        if df.empty:
+            return JSONResponse({"error": "LTE CSV is empty or failed to load"})
+        
+        # Check column names
+        columns = list(df.columns)
+        if 'Abbreviated name' not in columns:
+            return JSONResponse({"error": f"'Abbreviated name' column not found. Available columns: {columns}"})
+        
+        if 'Managed object' not in columns:
+            return JSONResponse({"error": f"'Managed object' column not found. Available columns: {columns}"})
+        
+        # Check if there's data
+        total_rows = len(df)
+        unique_abbr = df['Abbreviated name'].dropna().nunique()
+        unique_mo = df['Managed object'].dropna().nunique()
+        
+        # Test search if abbreviated_name provided
+        if abbreviated_name:
+            filtered = df[df['Abbreviated name'].str.strip().str.lower() == abbreviated_name.strip().lower()]
+            found_rows = len(filtered)
+            found_mo = filtered['Managed object'].dropna().unique().tolist()
+        else:
+            found_rows = 0
+            found_mo = []
+        
+        return JSONResponse({
+            "status": "success",
+            "csv_info": {
+                "total_rows": total_rows,
+                "unique_abbreviated_names": unique_abbr,
+                "unique_managed_objects": unique_mo,
+                "columns": columns
+            },
+            "search_test": {
+                "search_term": abbreviated_name,
+                "found_rows": found_rows,
+                "found_managed_objects": found_mo
+            }
+        })
+        
+    except Exception as e:
+        return JSONResponse({"error": f"Test failed: {str(e)}"})
+
+# Add this endpoint to clear LTE CSV cache
+@app.get('/api/clear-lte-cache')
+def clear_lte_cache():
+    """Clear LTE CSV cache to force reload"""
+    global lte_csv_cache
+    lte_csv_cache = None
+    return JSONResponse({"message": "LTE CSV cache cleared successfully"})
+
+# Add this simple debug endpoint
+@app.get('/api/debug-lte-csv')
+def debug_lte_csv():
+    """Simple debug endpoint to check LTE CSV"""
+    try:
+        df = get_lte_csv()
+        return {
+            "success": True,
+            "rows": len(df),
+            "columns": list(df.columns),
+            "sample_data": df.head(3).to_dict('records') if not df.empty else []
+        }
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

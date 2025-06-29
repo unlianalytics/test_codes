@@ -1,339 +1,718 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('[KPI Dashboard] Initializing...');
+    console.log('[KPI Dashboard] Initializing enhanced version with AI analysis...');
     
     // Initialize dashboard
     initializeDashboard();
     
-    // Update data every 30 seconds
-    setInterval(updateDashboardData, 30000);
-    
     function initializeDashboard() {
-        console.log('[KPI Dashboard] Loading initial data...');
-        
-        // Update last update time
-        updateLastUpdate();
-        
-        // Load data points count
-        loadDataPointsCount();
-        
-        // Initialize with sample data (replace with real API calls)
-        updateKpiValues();
-        
-        console.log('[KPI Dashboard] Initialization complete');
+        updateDashboardStats();
+        setInterval(updateDashboardStats, 30000); // Update every 30 seconds
     }
     
-    function updateLastUpdate() {
+    function updateDashboardStats() {
         const now = new Date();
-        const timeString = now.toLocaleTimeString();
-        document.getElementById('lastUpdate').textContent = timeString;
+        document.getElementById('lastUpdate').textContent = 'Just now';
+        document.getElementById('dataPoints').textContent = Math.floor(Math.random() * 1000) + 500;
     }
     
-    function loadDataPointsCount() {
-        // This would typically come from your backend
-        // For now, using a sample value
-        document.getElementById('dataPoints').textContent = '2,847';
-    }
-    
-    function updateKpiValues() {
-        // This would typically fetch real data from your backend
-        // For now, using sample data with some randomization
+    // Enhanced KPI Details Modal with AI Analysis
+    window.showKpiDetails = async function(category) {
+        console.log('[KPI] Showing details for:', category);
         
-        // Signal Quality
-        document.getElementById('rsrp-value').textContent = `${-85 + Math.random() * 10} dBm`;
-        document.getElementById('sinr-value').textContent = `${18 + Math.random() * 5} dB`;
-        document.getElementById('rsrq-value').textContent = `${-8 + Math.random() * 3} dB`;
+        const modal = document.getElementById('kpiModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const kpiDetails = document.getElementById('kpiDetails');
         
-        // Coverage
-        document.getElementById('coverage-area').textContent = `${98 + Math.random() * 2}%`;
-        document.getElementById('avg-distance').textContent = `${1.2 + Math.random() * 0.5} km`;
-        document.getElementById('cell-range').textContent = `${2.8 + Math.random() * 0.4} km`;
+        // Set modal title
+        const titles = {
+            'signal-quality': 'Signal Quality Analytics',
+            'coverage': 'Coverage Analysis',
+            'throughput': 'Throughput Performance',
+            'interference': 'Interference Analysis',
+            'mobility': 'Mobility Performance',
+            'capacity': 'Capacity Utilization'
+        };
         
-        // Throughput
-        document.getElementById('avg-speed').textContent = `${45 + Math.random() * 15} Mbps`;
-        document.getElementById('peak-speed').textContent = `${78 + Math.random() * 20} Mbps`;
-        document.getElementById('bandwidth').textContent = '20 MHz';
+        modalTitle.textContent = titles[category] || 'KPI Details';
         
-        // Interference
-        document.getElementById('interference-ratio').textContent = `${12 + Math.random() * 8}%`;
-        document.getElementById('noise-floor').textContent = `${-95 + Math.random() * 5} dBm`;
-        document.getElementById('sir-value').textContent = `${15 + Math.random() * 5} dB`;
+        // Show modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
         
-        // Mobility
-        document.getElementById('handover-success').textContent = `${99 + Math.random() * 1}%`;
-        document.getElementById('location-updates').textContent = `${1245 + Math.random() * 200}/hr`;
-        document.getElementById('cell-changes').textContent = `${89 + Math.random() * 20}/hr`;
+        // Create enhanced chart
+        createEnhancedChart(category);
         
-        // Capacity
-        document.getElementById('load-value').textContent = `${67 + Math.random() * 15}%`;
-        document.getElementById('utilization').textContent = `${72 + Math.random() * 10}%`;
-        document.getElementById('congestion').textContent = `${8 + Math.random() * 5}%`;
-    }
-    
-    function updateDashboardData() {
-        console.log('[KPI Dashboard] Updating data...');
-        updateKpiValues();
-        updateLastUpdate();
-    }
-});
-
-// Global functions for modal handling
-let currentChart = null;
-
-function showKpiDetails(category) {
-    console.log('[KPI Dashboard] Showing details for:', category);
-    
-    const modal = document.getElementById('kpiModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const kpiDetails = document.getElementById('kpiDetails');
-    
-    // Set modal title based on category
-    const titles = {
-        'signal-quality': 'Signal Quality KPIs',
-        'coverage': 'Coverage KPIs',
-        'throughput': 'Throughput KPIs',
-        'interference': 'Interference KPIs',
-        'mobility': 'Mobility KPIs',
-        'capacity': 'Capacity KPIs'
+        // Populate details with loading state
+        populateKpiDetails(category);
+        
+        // Generate AI analysis
+        await generateAIAnalysis(category);
     };
     
-    modalTitle.textContent = titles[category] || 'KPI Details';
-    
-    // Show modal
-    modal.style.display = 'flex';
-    
-    // Create chart
-    createKpiChart(category);
-    
-    // Load detailed information
-    loadKpiDetails(category);
-}
-
-function closeKpiModal() {
-    console.log('[KPI Dashboard] Closing modal');
-    
-    const modal = document.getElementById('kpiModal');
-    modal.style.display = 'none';
-    
-    // Destroy current chart if it exists
-    if (currentChart) {
-        currentChart.destroy();
-        currentChart = null;
-    }
-}
-
-function createKpiChart(category) {
-    const ctx = document.getElementById('kpiChart').getContext('2d');
-    
-    // Destroy existing chart
-    if (currentChart) {
-        currentChart.destroy();
-    }
-    
-    // Chart configuration based on category
-    const chartConfig = getChartConfig(category);
-    
-    currentChart = new Chart(ctx, chartConfig);
-}
-
-function getChartConfig(category) {
-    const baseConfig = {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: []
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'KPI Trends'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+    window.closeKpiModal = function() {
+        const modal = document.getElementById('kpiModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        
+        // Destroy existing chart
+        const canvas = document.getElementById('kpiChart');
+        if (canvas && window.currentChart) {
+            window.currentChart.destroy();
+            window.currentChart = null;
         }
     };
     
-    // Generate sample data based on category
-    const timeLabels = [];
-    const now = new Date();
-    for (let i = 23; i >= 0; i--) {
-        const time = new Date(now.getTime() - i * 60 * 60 * 1000);
-        timeLabels.push(time.getHours() + ':00');
+    // AI Analysis Generation
+    async function generateAIAnalysis(category) {
+        const analysisContainer = document.getElementById('aiAnalysis');
+        if (!analysisContainer) return;
+        
+        // Show loading state
+        analysisContainer.innerHTML = `
+            <div class="ai-analysis-loading">
+                <div class="loading-spinner"></div>
+                <p>🤖 AI Agent is analyzing your ${category.replace('-', ' ')} data...</p>
+            </div>
+        `;
+        
+        try {
+            // Get current KPI data for context
+            const kpiData = getCurrentKpiData(category);
+            
+            // Create AI prompt
+            const prompt = createAIPrompt(category, kpiData);
+            
+            console.log('[AI] Sending analysis request for:', category);
+            
+            // Call AI endpoint
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `message=${encodeURIComponent(prompt)}`
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.response) {
+                // Display AI analysis
+                analysisContainer.innerHTML = `
+                    <div class="ai-analysis-content">
+                        <div class="ai-header">
+                            <span class="ai-icon">🤖</span>
+                            <span class="ai-title">AI Analysis</span>
+                        </div>
+                        <div class="ai-text">
+                            ${formatAIAnalysis(data.response)}
+                        </div>
+                        <div class="ai-footer">
+                            <span class="ai-timestamp">Generated just now</span>
+                            <button class="refresh-analysis-btn" onclick="refreshAIAnalysis('${category}')">
+                                🔄 Refresh Analysis
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                throw new Error('No response from AI');
+            }
+            
+        } catch (error) {
+            console.error('[AI] Analysis error:', error);
+            analysisContainer.innerHTML = `
+                <div class="ai-analysis-error">
+                    <div class="error-icon">⚠️</div>
+                    <p>Unable to generate AI analysis at this time.</p>
+                    <button class="retry-btn" onclick="refreshAIAnalysis('${category}')">
+                        🔄 Retry Analysis
+                    </button>
+                </div>
+            `;
+        }
     }
     
-    baseConfig.data.labels = timeLabels;
-    
-    switch (category) {
-        case 'signal-quality':
-            baseConfig.data.datasets = [
-                {
-                    label: 'RSRP (dBm)',
-                    data: generateRandomData(-90, -75, 24),
-                    borderColor: '#e20074',
-                    backgroundColor: 'rgba(226, 0, 116, 0.1)',
-                    tension: 0.4
-                },
-                {
-                    label: 'SINR (dB)',
-                    data: generateRandomData(15, 25, 24),
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    tension: 0.4
-                }
-            ];
-            break;
-            
-        case 'coverage':
-            baseConfig.data.datasets = [
-                {
-                    label: 'Coverage Area (%)',
-                    data: generateRandomData(95, 100, 24),
-                    borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    tension: 0.4
-                }
-            ];
-            break;
-            
-        case 'throughput':
-            baseConfig.data.datasets = [
-                {
-                    label: 'Average Speed (Mbps)',
-                    data: generateRandomData(40, 60, 24),
-                    borderColor: '#ffc107',
-                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                    tension: 0.4
-                },
-                {
-                    label: 'Peak Speed (Mbps)',
-                    data: generateRandomData(70, 90, 24),
-                    borderColor: '#dc3545',
-                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                    tension: 0.4
-                }
-            ];
-            break;
-            
-        case 'interference':
-            baseConfig.data.datasets = [
-                {
-                    label: 'Interference Ratio (%)',
-                    data: generateRandomData(8, 18, 24),
-                    borderColor: '#6f42c1',
-                    backgroundColor: 'rgba(111, 66, 193, 0.1)',
-                    tension: 0.4
-                }
-            ];
-            break;
-            
-        case 'mobility':
-            baseConfig.data.datasets = [
-                {
-                    label: 'Handover Success Rate (%)',
-                    data: generateRandomData(98, 100, 24),
-                    borderColor: '#17a2b8',
-                    backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                    tension: 0.4
-                }
-            ];
-            break;
-            
-        case 'capacity':
-            baseConfig.data.datasets = [
-                {
-                    label: 'Load (%)',
-                    data: generateRandomData(60, 80, 24),
-                    borderColor: '#fd7e14',
-                    backgroundColor: 'rgba(253, 126, 20, 0.1)',
-                    tension: 0.4
-                },
-                {
-                    label: 'Utilization (%)',
-                    data: generateRandomData(65, 85, 24),
-                    borderColor: '#20c997',
-                    backgroundColor: 'rgba(32, 201, 151, 0.1)',
-                    tension: 0.4
-                }
-            ];
-            break;
-    }
-    
-    return baseConfig;
-}
-
-function generateRandomData(min, max, count) {
-    const data = [];
-    for (let i = 0; i < count; i++) {
-        data.push(min + Math.random() * (max - min));
-    }
-    return data;
-}
-
-function loadKpiDetails(category) {
-    const kpiDetails = document.getElementById('kpiDetails');
-    
-    const details = {
-        'signal-quality': `
-            <h3>Signal Quality Analysis</h3>
-            <p><strong>RSRP (Reference Signal Received Power):</strong> Measures the power of the reference signal received by the UE. Values above -85 dBm indicate good signal strength.</p>
-            <p><strong>SINR (Signal-to-Interference-plus-Noise Ratio):</strong> Indicates the quality of the signal. Values above 15 dB represent excellent signal quality.</p>
-            <p><strong>RSRQ (Reference Signal Received Quality):</strong> Measures the quality of the received reference signal. Values above -10 dB indicate good signal quality.</p>
-        `,
-        'coverage': `
-            <h3>Coverage Analysis</h3>
-            <p><strong>Coverage Area:</strong> Percentage of the target area with adequate signal strength. Values above 95% indicate excellent coverage.</p>
-            <p><strong>Average Distance:</strong> Mean distance between user equipment and serving cell. Lower values indicate better coverage density.</p>
-            <p><strong>Cell Range:</strong> Maximum effective range of the cell. Important for network planning and optimization.</p>
-        `,
-        'throughput': `
-            <h3>Throughput Analysis</h3>
-            <p><strong>Average Speed:</strong> Mean data transfer rate experienced by users. Critical for user experience assessment.</p>
-            <p><strong>Peak Speed:</strong> Maximum achievable data transfer rate under optimal conditions.</p>
-            <p><strong>Bandwidth:</strong> Available frequency spectrum for data transmission.</p>
-        `,
-        'interference': `
-            <h3>Interference Analysis</h3>
-            <p><strong>Interference Ratio:</strong> Percentage of interference affecting signal quality. Lower values are better.</p>
-            <p><strong>Noise Floor:</strong> Background noise level in the system. Critical for signal quality assessment.</p>
-            <p><strong>SIR (Signal-to-Interference Ratio):</strong> Ratio of desired signal power to interference power.</p>
-        `,
-        'mobility': `
-            <h3>Mobility Analysis</h3>
-            <p><strong>Handover Success Rate:</strong> Percentage of successful handovers between cells. Critical for mobile user experience.</p>
-            <p><strong>Location Updates:</strong> Frequency of location registration updates. Indicates network activity level.</p>
-            <p><strong>Cell Changes:</strong> Number of cell transitions per hour. Important for mobility management.</p>
-        `,
-        'capacity': `
-            <h3>Capacity Analysis</h3>
-            <p><strong>Load:</strong> Current network load percentage. Values above 80% may indicate capacity issues.</p>
-            <p><strong>Utilization:</strong> Resource utilization rate. Important for capacity planning.</p>
-            <p><strong>Congestion:</strong> Percentage of time the network experiences congestion. Lower values are better.</p>
-        `
+    // Refresh AI Analysis
+    window.refreshAIAnalysis = async function(category) {
+        await generateAIAnalysis(category);
     };
     
-    kpiDetails.innerHTML = details[category] || '<p>No detailed information available for this category.</p>';
-}
-
-// Close modal when clicking outside
-document.addEventListener('click', function(e) {
-    const modal = document.getElementById('kpiModal');
-    if (e.target === modal) {
-        closeKpiModal();
+    function getCurrentKpiData(category) {
+        // Get current values from the dashboard
+        const data = {};
+        
+        switch(category) {
+            case 'signal-quality':
+                data.rsrp = document.getElementById('rsrp-value')?.textContent || '-85 dBm';
+                data.sinr = document.getElementById('sinr-value')?.textContent || '18.5 dB';
+                data.rsrq = document.getElementById('rsrq-value')?.textContent || '-8.2 dB';
+                break;
+            case 'coverage':
+                data.coverageArea = document.getElementById('coverage-area')?.textContent || '98.5%';
+                data.avgDistance = document.getElementById('avg-distance')?.textContent || '1.2 km';
+                data.cellRange = document.getElementById('cell-range')?.textContent || '2.8 km';
+                break;
+            case 'throughput':
+                data.avgSpeed = document.getElementById('avg-speed')?.textContent || '45.2 Mbps';
+                data.peakSpeed = document.getElementById('peak-speed')?.textContent || '78.9 Mbps';
+                data.bandwidth = document.getElementById('bandwidth')?.textContent || '20 MHz';
+                break;
+            case 'interference':
+                data.interferenceRatio = document.getElementById('interference-ratio')?.textContent || '12.3%';
+                data.noiseFloor = document.getElementById('noise-floor')?.textContent || '-95 dBm';
+                data.sir = document.getElementById('sir-value')?.textContent || '15.2 dB';
+                break;
+            case 'mobility':
+                data.handoverSuccess = document.getElementById('handover-success')?.textContent || '99.2%';
+                data.locationUpdates = document.getElementById('location-updates')?.textContent || '1,245/hr';
+                data.cellChanges = document.getElementById('cell-changes')?.textContent || '89/hr';
+                break;
+            case 'capacity':
+                data.load = document.getElementById('load-value')?.textContent || '67.8%';
+                data.utilization = document.getElementById('utilization')?.textContent || '72.3%';
+                data.congestion = document.getElementById('congestion')?.textContent || '8.5%';
+                break;
+        }
+        
+        return data;
     }
-});
+    
+    function createAIPrompt(category, kpiData) {
+        const prompts = {
+            'signal-quality': `As an RF engineering expert, analyze the current signal quality metrics for our LTE network:
+- RSRP: ${kpiData.rsrp}
+- SINR: ${kpiData.sinr}
+- RSRQ: ${kpiData.rsrq}
 
-// Close modal with Escape key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeKpiModal();
+Please provide a comprehensive analysis including:
+1. Overall signal quality assessment
+2. Performance trends and implications
+3. Potential issues or areas of concern
+4. Recommendations for optimization
+5. Comparison with industry benchmarks
+
+Format your response as a professional analysis report suitable for network engineers.`,
+            
+            'coverage': `As an RF engineering expert, analyze the current coverage performance for our LTE network:
+- Coverage Area: ${kpiData.coverageArea}
+- Average Distance: ${kpiData.avgDistance}
+- Cell Range: ${kpiData.cellRange}
+
+Please provide a comprehensive analysis including:
+1. Overall coverage assessment
+2. Coverage gaps and weak areas
+3. Cell planning implications
+4. Recommendations for coverage improvement
+5. Indoor vs outdoor coverage considerations
+
+Format your response as a professional analysis report suitable for network engineers.`,
+            
+            'throughput': `As an RF engineering expert, analyze the current throughput performance for our LTE network:
+- Average Speed: ${kpiData.avgSpeed}
+- Peak Speed: ${kpiData.peakSpeed}
+- Bandwidth: ${kpiData.bandwidth}
+
+Please provide a comprehensive analysis including:
+1. Overall throughput performance assessment
+2. Speed distribution and user experience
+3. Capacity utilization analysis
+4. Bottlenecks and optimization opportunities
+5. Recommendations for performance improvement
+
+Format your response as a professional analysis report suitable for network engineers.`,
+            
+            'interference': `As an RF engineering expert, analyze the current interference situation for our LTE network:
+- Interference Ratio: ${kpiData.interferenceRatio}
+- Noise Floor: ${kpiData.noiseFloor}
+- SIR: ${kpiData.sir}
+
+Please provide a comprehensive analysis including:
+1. Overall interference assessment
+2. Sources of interference
+3. Impact on network performance
+4. Interference mitigation strategies
+5. Recommendations for interference reduction
+
+Format your response as a professional analysis report suitable for network engineers.`,
+            
+            'mobility': `As an RF engineering expert, analyze the current mobility performance for our LTE network:
+- Handover Success Rate: ${kpiData.handoverSuccess}
+- Location Updates: ${kpiData.locationUpdates}
+- Cell Changes: ${kpiData.cellChanges}
+
+Please provide a comprehensive analysis including:
+1. Overall mobility performance assessment
+2. Handover efficiency analysis
+3. Mobility patterns and trends
+4. Potential mobility issues
+5. Recommendations for mobility optimization
+
+Format your response as a professional analysis report suitable for network engineers.`,
+            
+            'capacity': `As an RF engineering expert, analyze the current capacity utilization for our LTE network:
+- Load: ${kpiData.load}
+- Utilization: ${kpiData.utilization}
+- Congestion: ${kpiData.congestion}
+
+Please provide a comprehensive analysis including:
+1. Overall capacity assessment
+2. Resource utilization patterns
+3. Congestion analysis and impact
+4. Capacity planning considerations
+5. Recommendations for capacity optimization
+
+Format your response as a professional analysis report suitable for network engineers.`
+        };
+        
+        return prompts[category] || prompts['signal-quality'];
     }
+    
+    function formatAIAnalysis(text) {
+        // Convert plain text to formatted HTML with proper paragraphs
+        return text
+            .split('\n\n')
+            .map(paragraph => `<p>${paragraph.trim()}</p>`)
+            .join('');
+    }
+    
+    function createEnhancedChart(category) {
+        const canvas = document.getElementById('kpiChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Destroy existing chart
+        if (window.currentChart) {
+            window.currentChart.destroy();
+        }
+        
+        // Generate enhanced data based on category
+        const chartData = generateChartData(category);
+        
+        // Enhanced chart configuration
+        window.currentChart = new Chart(ctx, {
+            type: chartData.type,
+            data: chartData.data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: chartData.title,
+                        font: {
+                            size: 18,
+                            weight: 'bold'
+                        },
+                        color: '#333'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#e20074',
+                        borderWidth: 2,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y + (chartData.unit || '');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: chartData.xAxisLabel,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: chartData.yAxisLabel,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 6,
+                        hoverRadius: 8
+                    },
+                    line: {
+                        borderWidth: 3
+                    },
+                    bar: {
+                        borderWidth: 2
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    }
+    
+    function generateChartData(category) {
+        const timeLabels = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'];
+        
+        switch(category) {
+            case 'signal-quality':
+                return {
+                    type: 'line',
+                    title: 'Signal Quality Metrics Over Time',
+                    xAxisLabel: 'Time (24h)',
+                    yAxisLabel: 'Signal Strength (dBm/dB)',
+                    unit: '',
+                    data: {
+                        labels: timeLabels,
+                        datasets: [
+                            {
+                                label: 'RSRP',
+                                data: [-75, -78, -82, -85, -88, -83, -77],
+                                borderColor: '#e20074',
+                                backgroundColor: 'rgba(226, 0, 116, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'SINR',
+                                data: [22, 20, 18, 16, 14, 17, 19],
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'RSRQ',
+                                data: [-6, -7, -8, -9, -10, -8, -7],
+                                borderColor: '#007bff',
+                                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    }
+                };
+                
+            case 'coverage':
+                return {
+                    type: 'bar',
+                    title: 'Coverage Performance Metrics',
+                    xAxisLabel: 'Time Periods',
+                    yAxisLabel: 'Coverage Percentage (%)',
+                    unit: '%',
+                    data: {
+                        labels: timeLabels,
+                        datasets: [
+                            {
+                                label: 'Coverage Area',
+                                data: [99.2, 98.8, 98.5, 98.2, 98.0, 98.3, 98.7],
+                                backgroundColor: 'rgba(226, 0, 116, 0.8)',
+                                borderColor: '#e20074',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Cell Range',
+                                data: [95.5, 94.8, 94.2, 93.8, 93.5, 94.0, 94.5],
+                                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                                borderColor: '#28a745',
+                                borderWidth: 2
+                            }
+                        ]
+                    }
+                };
+                
+            case 'throughput':
+                return {
+                    type: 'line',
+                    title: 'Throughput Performance Analysis',
+                    xAxisLabel: 'Time (24h)',
+                    yAxisLabel: 'Speed (Mbps)',
+                    unit: ' Mbps',
+                    data: {
+                        labels: timeLabels,
+                        datasets: [
+                            {
+                                label: 'Average Speed',
+                                data: [52, 48, 45, 42, 38, 44, 49],
+                                borderColor: '#e20074',
+                                backgroundColor: 'rgba(226, 0, 116, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            },
+                            {
+                                label: 'Peak Speed',
+                                data: [85, 82, 78, 75, 72, 76, 80],
+                                borderColor: '#ffc107',
+                                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }
+                        ]
+                    }
+                };
+                
+            case 'interference':
+                return {
+                    type: 'radar',
+                    title: 'Interference Analysis Dashboard',
+                    xAxisLabel: '',
+                    yAxisLabel: '',
+                    unit: '',
+                    data: {
+                        labels: ['Interference Ratio', 'Noise Floor', 'SIR', 'C/I Ratio', 'Adjacent Channel', 'Co-channel'],
+                        datasets: [
+                            {
+                                label: 'Current Values',
+                                data: [12.3, 85, 15.2, 18.5, 8.7, 11.2],
+                                borderColor: '#e20074',
+                                backgroundColor: 'rgba(226, 0, 116, 0.2)',
+                                pointBackgroundColor: '#e20074',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: '#e20074'
+                            },
+                            {
+                                label: 'Target Values',
+                                data: [8.0, 90, 20.0, 25.0, 5.0, 8.0],
+                                borderColor: '#28a745',
+                                backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                                pointBackgroundColor: '#28a745',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: '#28a745'
+                            }
+                        ]
+                    }
+                };
+                
+            case 'mobility':
+                return {
+                    type: 'doughnut',
+                    title: 'Mobility Performance Distribution',
+                    xAxisLabel: '',
+                    yAxisLabel: '',
+                    unit: '',
+                    data: {
+                        labels: ['Successful Handovers', 'Failed Handovers', 'Location Updates', 'Cell Changes'],
+                        datasets: [
+                            {
+                                data: [99.2, 0.8, 85.5, 14.5],
+                                backgroundColor: [
+                                    '#28a745',
+                                    '#dc3545',
+                                    '#007bff',
+                                    '#ffc107'
+                                ],
+                                borderColor: [
+                                    '#1e7e34',
+                                    '#c82333',
+                                    '#0056b3',
+                                    '#e0a800'
+                                ],
+                                borderWidth: 3
+                            }
+                        ]
+                    }
+                };
+                
+            case 'capacity':
+                return {
+                    type: 'bar',
+                    title: 'Capacity Utilization Analysis',
+                    xAxisLabel: 'Time Periods',
+                    yAxisLabel: 'Utilization Percentage (%)',
+                    unit: '%',
+                    data: {
+                        labels: timeLabels,
+                        datasets: [
+                            {
+                                label: 'Load',
+                                data: [65, 68, 72, 75, 78, 74, 70],
+                                backgroundColor: 'rgba(226, 0, 116, 0.8)',
+                                borderColor: '#e20074',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Utilization',
+                                data: [70, 73, 76, 79, 82, 78, 74],
+                                backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                                borderColor: '#28a745',
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Congestion',
+                                data: [5, 7, 9, 12, 15, 11, 8],
+                                backgroundColor: 'rgba(220, 53, 69, 0.8)',
+                                borderColor: '#dc3545',
+                                borderWidth: 2
+                            }
+                        ]
+                    }
+                };
+                
+            default:
+                return {
+                    type: 'line',
+                    title: 'KPI Performance',
+                    xAxisLabel: 'Time',
+                    yAxisLabel: 'Value',
+                    unit: '',
+                    data: {
+                        labels: timeLabels,
+                        datasets: [{
+                            label: 'Performance',
+                            data: [80, 85, 82, 88, 90, 87, 85],
+                            borderColor: '#e20074',
+                            backgroundColor: 'rgba(226, 0, 116, 0.1)',
+                            fill: true
+                        }]
+                    }
+                };
+        }
+    }
+    
+    function populateKpiDetails(category) {
+        const kpiDetails = document.getElementById('kpiDetails');
+        
+        const details = {
+            'signal-quality': {
+                title: 'Signal Quality Metrics',
+                items: [
+                    { label: 'Average RSRP', value: '-85 dBm', status: 'good' },
+                    { label: 'Average SINR', value: '18.5 dB', status: 'excellent' },
+                    { label: 'Average RSRQ', value: '-8.2 dB', status: 'good' },
+                    { label: 'Signal Stability', value: '95.2%', status: 'excellent' },
+                    { label: 'Weak Signal Areas', value: '2.3%', status: 'warning' },
+                    { label: 'Strong Signal Areas', value: '78.9%', status: 'excellent' }
+                ]
+            },
+            'coverage': {
+                title: 'Coverage Analysis',
+                items: [
+                    { label: 'Total Coverage Area', value: '98.5%', status: 'excellent' },
+                    { label: 'Average Cell Range', value: '2.8 km', status: 'good' },
+                    { label: 'Coverage Gaps', value: '1.5%', status: 'warning' },
+                    { label: 'Indoor Coverage', value: '92.3%', status: 'good' },
+                    { label: 'Outdoor Coverage', value: '99.1%', status: 'excellent' },
+                    { label: 'Edge Coverage', value: '85.7%', status: 'good' }
+                ]
+            },
+            'throughput': {
+                title: 'Throughput Performance',
+                items: [
+                    { label: 'Average Speed', value: '45.2 Mbps', status: 'good' },
+                    { label: 'Peak Speed', value: '78.9 Mbps', status: 'excellent' },
+                    { label: 'Bandwidth Utilization', value: '72.3%', status: 'good' },
+                    { label: 'Latency', value: '15.2 ms', status: 'excellent' },
+                    { label: 'Packet Loss', value: '0.3%', status: 'excellent' },
+                    { label: 'Jitter', value: '2.1 ms', status: 'good' }
+                ]
+            },
+            'interference': {
+                title: 'Interference Analysis',
+                items: [
+                    { label: 'Interference Ratio', value: '12.3%', status: 'warning' },
+                    { label: 'Noise Floor', value: '-95 dBm', status: 'good' },
+                    { label: 'Signal-to-Interference', value: '15.2 dB', status: 'good' },
+                    { label: 'Carrier-to-Interference', value: '18.5 dB', status: 'excellent' },
+                    { label: 'Adjacent Channel', value: '8.7%', status: 'good' },
+                    { label: 'Co-channel', value: '11.2%', status: 'warning' }
+                ]
+            },
+            'mobility': {
+                title: 'Mobility Performance',
+                items: [
+                    { label: 'Handover Success Rate', value: '99.2%', status: 'excellent' },
+                    { label: 'Location Updates', value: '1,245/hr', status: 'good' },
+                    { label: 'Cell Changes', value: '89/hr', status: 'good' },
+                    { label: 'Handover Delay', value: '45 ms', status: 'excellent' },
+                    { label: 'Failed Handovers', value: '0.8%', status: 'good' },
+                    { label: 'Mobility Efficiency', value: '94.7%', status: 'excellent' }
+                ]
+            },
+            'capacity': {
+                title: 'Capacity Utilization',
+                items: [
+                    { label: 'Current Load', value: '67.8%', status: 'good' },
+                    { label: 'Utilization Rate', value: '72.3%', status: 'good' },
+                    { label: 'Congestion Level', value: '8.5%', status: 'warning' },
+                    { label: 'Available Capacity', value: '27.7%', status: 'good' },
+                    { label: 'Peak Usage', value: '89.2%', status: 'warning' },
+                    { label: 'Capacity Efficiency', value: '91.5%', status: 'excellent' }
+                ]
+            }
+        };
+        
+        const categoryDetails = details[category] || details['signal-quality'];
+        
+        kpiDetails.innerHTML = `
+            <h3>${categoryDetails.title}</h3>
+            <div class="kpi-details-grid">
+                ${categoryDetails.items.map(item => `
+                    <div class="kpi-detail-item">
+                        <div class="kpi-detail-label">${item.label}</div>
+                        <div class="kpi-detail-value" style="color: ${getStatusColor(item.status)}">${item.value}</div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+    
+    function getStatusColor(status) {
+        const colors = {
+            'excellent': '#007bff',
+            'good': '#28a745',
+            'warning': '#ffc107',
+            'danger': '#dc3545'
+        };
+        return colors[status] || '#333';
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('kpiModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeKpiModal();
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeKpiModal();
+        }
+    });
+    
+    console.log('[KPI Dashboard] Enhanced initialization with AI analysis complete!');
 }); 

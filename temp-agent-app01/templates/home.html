@@ -21,101 +21,105 @@
         </header>
 
         <main class="apps-container">
-            <div class="apps-grid">
-                <!-- RF AI Agent -->
-                <div class="app-card" onclick="window.location.href='/rf-ai-agent'">
-                    <div class="app-icon">🤖</div>
-                    <h3>RF AI Agent</h3>
-                    <p>Advanced AI assistant specialized in RF engineering and network performance analysis with RAG capabilities.</p>
-                    <div class="app-features">
-                        <span class="feature-tag">AI Chat</span>
-                        <span class="feature-tag">RAG Enhanced</span>
-                        <span class="feature-tag">Network Analysis</span>
-                        <span class="feature-tag">KPI Metrics</span>
-                    </div>
-                    <div class="app-status">
-                        <span class="status-dot active"></span>
-                        <span class="status-text">Available</span>
+            <div class="apps-container">
+                <!-- First row: Wide, centered Houston RF Team card -->
+                <div class="apps-row apps-row-center">
+                    <div class="app-card app-card-wide" onclick="window.location.href='/houston-rf-team'">
+                        <div class="card-icon team-icon">
+                            <span>👥</span>
+                        </div>
+                        <div class="card-content">
+                            <h3>Houston RF Team</h3>
+                            <p>Meet our expert RF engineering team members and leadership</p>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Network Analyzer -->
-                <div class="app-card" onclick="window.location.href='/network-analyzer'">
-                    <div class="app-icon">📊</div>
-                    <h3>Network Analyzer</h3>
-                    <p>Comprehensive network performance analysis for RF engineers.</p>
-                    <div class="app-features">
-                        <span class="feature-tag">Site Health Checker</span>
-                        <span class="feature-tag">Handover Analyzer</span>
-                        <span class="feature-tag">Top Worst MPD</span>
+                <!-- Grid for the rest of the cards -->
+                <div class="apps-grid">
+                    <div class="app-card" onclick="window.location.href='/rf-ai-agent'">
+                        <div class="app-icon">🤖</div>
+                        <h3>RF AI Agent</h3>
+                        <p>Advanced AI assistant specialized in RF engineering and network performance analysis with RAG capabilities.</p>
+                        <div class="app-features">
+                            <span class="feature-tag">AI Chat</span>
+                            <span class="feature-tag">RAG Enhanced</span>
+                            <span class="feature-tag">Network Analysis</span>
+                            <span class="feature-tag">KPI Metrics</span>
+                        </div>
+                        <div class="app-status">
+                            <span class="status-dot active"></span>
+                            <span class="status-text">Available</span>
+                        </div>
                     </div>
-                    <div class="app-status">
-                        <span class="status-dot coming-soon"></span>
-                        <span class="status-text">Under Development</span>
+                    <div class="app-card" onclick="window.location.href='/network-analyzer'">
+                        <div class="app-icon">📊</div>
+                        <h3>Network Analyzer</h3>
+                        <p>Comprehensive network performance analysis for RF engineers.</p>
+                        <div class="app-features">
+                            <span class="feature-tag">Site Health Checker</span>
+                            <span class="feature-tag">Handover Analyzer</span>
+                            <span class="feature-tag">Top Worst MPD</span>
+                        </div>
+                        <div class="app-status">
+                            <span class="status-dot coming-soon"></span>
+                            <span class="status-text">Under Development</span>
+                        </div>
                     </div>
-                </div>
-
-                <!-- Network RTWP Tracker -->
-                <div class="app-card" onclick="window.location.href='/coverage-planner'">
-                    <div class="app-icon">📶</div>
-                    <h3>Network RTWP Tracker</h3>
-                    <p>A monitoring and Analytics tool that continuously tracks RTWP levels of LTE and NR.</p>
-                    <div class="app-features">
-                        <span class="feature-tag">Hourly</span>
-                        <span class="feature-tag">Daily</span>
-                        <span class="feature-tag">Top Worst Cells</span>
+                    <div class="app-card" onclick="window.location.href='/coverage-planner'">
+                        <div class="app-icon">📶</div>
+                        <h3>Network RTWP Tracker</h3>
+                        <p>A monitoring and Analytics tool that continuously tracks RTWP levels of LTE and NR.</p>
+                        <div class="app-features">
+                            <span class="feature-tag">Hourly</span>
+                            <span class="feature-tag">Daily</span>
+                            <span class="feature-tag">Top Worst Cells</span>
+                        </div>
+                        <div class="app-status">
+                            <span class="status-dot coming-soon"></span>
+                            <span class="status-text">Under Development</span>
+                        </div>
                     </div>
-                    <div class="app-status">
-                        <span class="status-dot coming-soon"></span>
-                        <span class="status-text">Under Development</span>
+                    <div class="app-card" onclick="window.location.href='/kpi-dashboard'">
+                        <div class="app-icon">📈</div>
+                        <h3>KPI Dashboard</h3>
+                        <p>Real-time KPI monitoring and reporting dashboard for network performance.</p>
+                        <div class="app-features">
+                            <span class="feature-tag">Real-time Data</span>
+                            <span class="feature-tag">Custom Reports</span>
+                            <span class="feature-tag">Alerts</span>
+                        </div>
+                        <div class="app-status">
+                            <span class="status-dot coming-soon"></span>
+                            <span class="status-text">Under Development</span>
+                        </div>
                     </div>
-                </div>
-
-                <!-- KPI Dashboard -->
-                <div class="app-card" onclick="window.location.href='/kpi-dashboard'">
-                    <div class="app-icon">📈</div>
-                    <h3>KPI Dashboard</h3>
-                    <p>Real-time KPI monitoring and reporting dashboard for network performance.</p>
-                    <div class="app-features">
-                        <span class="feature-tag">Real-time Data</span>
-                        <span class="feature-tag">Custom Reports</span>
-                        <span class="feature-tag">Alerts</span>
+                    <div class="app-card" onclick="window.location.href='/troubleshooting-guide'">
+                        <div class="app-icon">🔧</div>
+                        <h3>Troubleshooting Guide</h3>
+                        <p>Interactive troubleshooting guides and diagnostic tools for network issues.</p>
+                        <div class="app-features">
+                            <span class="feature-tag">Step-by-step</span>
+                            <span class="feature-tag">Diagnostics</span>
+                            <span class="feature-tag">Solutions</span>
+                        </div>
+                        <div class="app-status">
+                            <span class="status-dot coming-soon"></span>
+                            <span class="status-text">Under Development</span>
+                        </div>
                     </div>
-                    <div class="app-status">
-                        <span class="status-dot coming-soon"></span>
-                        <span class="status-text">Under Development</span>
-                    </div>
-                </div>
-
-                <!-- Troubleshooting Guide -->
-                <div class="app-card" onclick="window.location.href='/troubleshooting-guide'">
-                    <div class="app-icon">🔧</div>
-                    <h3>Troubleshooting Guide</h3>
-                    <p>Interactive troubleshooting guides and diagnostic tools for network issues.</p>
-                    <div class="app-features">
-                        <span class="feature-tag">Step-by-step</span>
-                        <span class="feature-tag">Diagnostics</span>
-                        <span class="feature-tag">Solutions</span>
-                    </div>
-                    <div class="app-status">
-                        <span class="status-dot coming-soon"></span>
-                        <span class="status-text">Under Development</span>
-                    </div>
-                </div>
-
-                <!-- Documentation Hub -->
-                <div class="app-card" onclick="window.location.href='/documentation-hub'">
-                    <div class="app-icon">📚</div>
-                    <h3>Documentation Hub</h3>
-                    <p>Centralized repository for T-Mobile engineering documentation and resources.</p>
-                    <div class="app-features">
-                        <span class="feature-tag">Parameter Search</span>
-                        <span class="feature-tag">Parameter Audit</span>
-                        <span class="feature-tag">Collaboration</span>
-                    </div>
-                    <div class="app-status">
-                        <span class="status-dot coming-soon"></span>
-                        <span class="status-text">Under Development</span>
+                    <div class="app-card" onclick="window.location.href='/documentation-hub'">
+                        <div class="app-icon">📚</div>
+                        <h3>Documentation Hub</h3>
+                        <p>Centralized repository for T-Mobile engineering documentation and resources.</p>
+                        <div class="app-features">
+                            <span class="feature-tag">Parameter Search</span>
+                            <span class="feature-tag">Parameter Audit</span>
+                            <span class="feature-tag">Collaboration</span>
+                        </div>
+                        <div class="app-status">
+                            <span class="status-dot coming-soon"></span>
+                            <span class="status-text">Under Development</span>
+                        </div>
                     </div>
                 </div>
             </div>

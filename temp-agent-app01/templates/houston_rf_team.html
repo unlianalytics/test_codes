@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Houston RF Team - T-Mobile RF Engineering</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/houston_rf_team.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Floating Congratulatory Banner -->
+    <div id="congrats-banner" class="floating-banner">
+        🎉 Congratulations, <span class="congrats-name">Ahmed Almidani</span>! Outstanding performance this quarter! 🎉
+        <button class="close-banner" onclick="document.getElementById('congrats-banner').classList.remove('show');">&times;</button>
+    </div>
+    <button class="back-to-apps" onclick="window.location.href='/'">&larr; Back to Apps</button>
+    <div class="container">
+        <!-- Hero Section -->
+        <header class="hero-section">
+            <div class="hero-background">
+                <div class="gradient-overlay"></div>
+            </div>
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>Houston RF Engineering Team</h1>
+                    <p class="hero-subtitle">Excellence in Radio Frequency Engineering & Network Optimization</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Team Members</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">15+</div>
+                            <div class="stat-label">Years Experience</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Projects Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">99.9%</div>
+                            <div class="stat-label">Network Uptime</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Leadership Section -->
+        <section class="leadership-section">
+            <div class="section-header">
+                <h2>Leadership Team</h2>
+                <p>Guiding our RF engineering excellence with strategic vision and technical expertise</p>
+            </div>
+            <div class="leadership-grid">
+                <!-- Senior RF Manager -->
+                <div class="leader-card senior">
+                    <div class="leader-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/senior_manager.jpg') }}" 
+                                 alt="Senior RF Manager" 
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="avatar-placeholder">PW</div>
+                        </div>
+                        <div class="status-indicator online"></div>
+                    </div>
+                    <div class="leader-info">
+                        <h3>Paul Williams</h3>
+                        <p class="leader-title">Senior RF Engineering Manager</p>
+                        <p class="leader-bio">20+ years of RF engineering experience specializing in LTE/5G network optimization and strategic planning. Leads the Houston RF team with expertise in network architecture and team development.</p>
+                        <div class="leader-expertise">
+                            <span class="expertise-tag">LTE/5G</span>
+                            <span class="expertise-tag">Network Planning</span>
+                            <span class="expertise-tag">Team Leadership</span>
+                            <span class="expertise-tag">Strategic Planning</span>
+                        </div>
+                        <div class="leader-contact">
+                            <a href="mailto:john.smith@t-mobile.com" class="contact-link">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                            <a href="#" class="contact-link">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RF Manager -->
+                <div class="leader-card manager">
+                    <div class="leader-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/rf_manager.jpg') }}" 
+                                 alt="RF Manager" 
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="avatar-placeholder">CG</div>
+                        </div>
+                        <div class="status-indicator online"></div>
+                    </div>
+                    <div class="leader-info">
+                        <h3>Christian Ghonda</h3>
+                        <p class="leader-title">RF Engineering Manager</p>
+                        <p class="leader-bio">Expert in RF performance optimization, interference management, and team development with 12+ years experience. Manages daily operations and technical excellence.</p>
+                        <div class="leader-expertise">
+                            <span class="expertise-tag">Performance</span>
+                            <span class="expertise-tag">Interference</span>
+                            <span class="expertise-tag">Optimization</span>
+                            <span class="expertise-tag">Operations</span>
+                        </div>
+                        <div class="leader-contact">
+                            <a href="mailto:christian.ghonda@t-mobile.com" class="contact-link">
+                                <i class="fas fa-envelope"></i>
+                            </a>
+                            <a href="#" class="contact-link">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Senior RF Engineers Section -->
+        <section class="engineering-section">
+            <div class="section-header">
+                <h2>Senior RF Engineers</h2>
+                <p>Our experienced engineers driving advanced network optimization and innovation</p>
+            </div>
+            <div class="team-grid">
+                <!-- Senior RF Engineer 1 -->
+                <div class="engineer-card senior-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='team_photos/ahmed_almidani.jpg') }}"
+                                 alt="Senior RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">AA</div>
+                        </div>
+                        <div class="experience-badge"></div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Ahmed Almidani</h3>
+                        <p class="engineer-title">Senior RF Engineer</p>
+                        <p class="engineer-bio">Specializes in advanced RF optimization and 5G network deployment with 10+ years experience. Expert in network planning and performance analysis.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">5G Deployment</span>
+                            <span class="skill-tag">Advanced Optimization</span>
+                            <span class="skill-tag">Network Planning</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Senior RF Engineer 2 -->
+                <div class="engineer-card senior-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/senior_engineer_2.jpg') }}"
+                                 alt="Senior RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">CN</div>
+                        </div>
+                        <div class="experience-badge"></div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Cuong Nguyen</h3>
+                        <p class="engineer-title">Senior RF Engineer</p>
+                        <p class="engineer-bio">Expert in interference analysis and spectrum management with deep knowledge of regulatory compliance and advanced troubleshooting.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">Interference Analysis</span>
+                            <span class="skill-tag">Spectrum Management</span>
+                            <span class="skill-tag">Regulatory Compliance</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Senior RF Engineer 3 -->
+                <div class="engineer-card senior-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/senior_engineer_3.jpg') }}"
+                                 alt="Senior RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">MC</div>
+                        </div>
+                        <div class="experience-badge"></div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Marc Coleman</h3>
+                        <p class="engineer-title">Senior RF Engineer</p>
+                        <p class="engineer-bio">Specializes in LTE network optimization and capacity planning with expertise in traffic analysis and network expansion strategies.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">LTE Optimization</span>
+                            <span class="skill-tag">Capacity Planning</span>
+                            <span class="skill-tag">Traffic Analysis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Senior RF Engineer 4 -->
+                <div class="engineer-card senior-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/senior_engineer_4.jpg') }}"
+                                 alt="Senior RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">PG</div>
+                        </div>
+                        <div class="experience-badge"></div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Paul Guerrero</h3>
+                        <p class="engineer-title">Senior RF Engineer</p>
+                        <p class="engineer-bio">Expert in coverage planning and site optimization with deep knowledge of propagation modeling and RF design principles.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">Coverage Planning</span>
+                            <span class="skill-tag">Propagation Modeling</span>
+                            <span class="skill-tag">RF Design</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Senior RF Engineer 5 -->
+                <div class="engineer-card senior-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/senior_engineer_5.jpeg') }}" style="width:100px;height:100px;border:2px solid red;">
+                            <div class="avatar-placeholder" style="display: none;">PJM</div>
+                        </div>
+                        <div class="experience-badge"></div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Patrick Magno</h3>
+                        <p class="engineer-title">Senior RF Engineer</p>
+                        <p class="engineer-bio">Specializes in mobility optimization and handover management with expertise in network performance monitoring and troubleshooting.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">Mobility Optimization</span>
+                            <span class="skill-tag">Handover Management</span>
+                            <span class="skill-tag">Performance Monitoring</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RF Engineers Section -->
+        <section class="engineering-section rf-engineers">
+            <div class="section-header">
+                <h2>RF Engineers</h2>
+                <p>Our dedicated engineers supporting network operations and optimization</p>
+            </div>
+            <div class="team-grid">
+                <!-- RF Engineer 1 -->
+                <div class="engineer-card mid-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_1.jpg') }}"
+                                 alt="RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">DMan</div>
+                        </div>
+                        <div class="experience-badge">Engineer</div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Teddy Abebe</h3>
+                        <p class="engineer-title">RF Engineer</p>
+                        <p class="engineer-bio">Focused on LTE network optimization and performance monitoring with strong analytical skills and attention to detail.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">LTE Optimization</span>
+                            <span class="skill-tag">Performance Monitoring</span>
+                            <span class="skill-tag">Data Analysis</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RF Engineer 2 -->
+                <div class="engineer-card mid-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_2.jpg') }}"
+                                 alt="RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">LF</div>
+                        </div>
+                        <div class="experience-badge">Engineer</div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Leo Fodje</h3>
+                        <p class="engineer-title">RF Engineer</p>
+                        <p class="engineer-bio">Specializes in interference analysis and troubleshooting with expertise in RF measurement techniques and tools.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">Interference Analysis</span>
+                            <span class="skill-tag">Troubleshooting</span>
+                            <span class="skill-tag">RF Measurements</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RF Engineer 3 -->
+                <div class="engineer-card mid-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_3.jpg') }}"
+                                 alt="RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">LC</div>
+                        </div>
+                        <div class="experience-badge">Engineer</div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Leng Chheng</h3>
+                        <p class="engineer-title">RF Engineer</p>
+                        <p class="engineer-bio">Expert in coverage analysis and site optimization with strong skills in GIS mapping and RF planning tools.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">Coverage Analysis</span>
+                            <span class="skill-tag">Site Optimization</span>
+                            <span class="skill-tag">GIS Mapping</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RF Engineer 4 -->
+                <div class="engineer-card mid-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_4.jpg') }}"
+                                 alt="RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">TN</div>
+                        </div>
+                        <div class="experience-badge">Engineer</div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Tom Nguyen</h3>
+                        <p class="engineer-title">RF Engineer</p>
+                        <p class="engineer-bio">Specializes in capacity planning and traffic engineering with expertise in network modeling and optimization algorithms.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">Capacity Planning</span>
+                            <span class="skill-tag">Traffic Engineering</span>
+                            <span class="skill-tag">Network Modeling</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RF Engineer 5 -->
+                <div class="engineer-card mid-engineer">
+                    <div class="engineer-avatar">
+                        <div class="avatar-wrapper">
+                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_5.jpg') }}"
+                                 alt="RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">RM</div>
+                        </div>
+                        <div class="experience-badge">Engineer</div>
+                    </div>
+                    <div class="engineer-info">
+                        <h3>Ramiro Montemayor</h3>
+                        <p class="engineer-title">RF Engineer</p>
+                        <p class="engineer-bio">Focused on mobility optimization and handover analysis with strong skills in network performance evaluation and reporting.</p>
+                        <div class="engineer-skills">
+                            <span class="skill-tag">Mobility Optimization</span>
+                            <span class="skill-tag">Handover Analysis</span>
+                            <span class="skill-tag">Performance Evaluation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Values Section -->
+        <section class="values-section">
+            <div class="section-header">
+                <h2>Our Values</h2>
+                <p>The principles that drive our excellence in RF engineering</p>
+            </div>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Performance Excellence</h3>
+                    <p>Delivering optimal network performance through innovative RF solutions and continuous optimization.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Collaboration</h3>
+                    <p>Working together as a cohesive team to solve complex RF challenges and share knowledge.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>Innovation</h3>
+                    <p>Embracing new technologies and methodologies to stay ahead in the rapidly evolving RF landscape.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Reliability</h3>
+                    <p>Ensuring network stability and reliability through meticulous planning and execution.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 T-Mobile RF Engineering - Houston Team</p>
+                <p>Excellence in Radio Frequency Engineering</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', path='/houston_rf_team.js') }}"></script>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            document.getElementById('congrats-banner').classList.add('show');
+        }, 800);
+        setTimeout(function() {
+            document.getElementById('congrats-banner').classList.remove('show');
+        }, 6800);
+        document.querySelectorAll('.engineer-card').forEach(function(card) {
+            card.style.opacity = '1';
+            card.style.transform = 'none';
+        });
+    });
+    </script>
+</body>
+</html> 

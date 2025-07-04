@@ -16,7 +16,7 @@ from typing import List, Dict, Set, Optional
 import re
 import glob
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import warnings
 import hashlib
 import pickle
@@ -26,6 +26,8 @@ from pathlib import Path
 import time
 import logging
 import threading
+import oracledb
+
 warnings.filterwarnings('ignore')
 
 # Configure logging
@@ -38,10 +40,13 @@ load_dotenv()
 app = FastAPI(title="T-Mobile RF AI Agent (Enhanced RAG)", description="Enhanced AI agent with improved RAG capabilities for RF Engineering")
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+import os
+static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # Templates
-templates = Jinja2Templates(directory="templates")
+templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+templates = Jinja2Templates(directory=templates_dir)
 
 # Initialize OpenAI client (OpenAI > 1.0 syntax)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", "your-openai-api-key-here"))
@@ -1026,6 +1031,10 @@ async def training_resources(request: Request):
     """Training Resources page"""
     return templates.TemplateResponse("training_resources.html", {"request": request})
 
+@app.get("/alarm-checker", response_class=HTMLResponse)
+def alarm_checker(request: Request):
+    return templates.TemplateResponse("alarm_checker.html", {"request": request})
+
 # Startup event
 @app.on_event("startup")
 async def startup_event():
@@ -1366,6 +1375,116 @@ def debug_lte_csv():
         }
     except Exception as e:
         return {"success": False, "error": str(e)}
+
+@app.get("/houston-rf-team", response_class=HTMLResponse)
+async def houston_rf_team(request: Request):
+    return templates.TemplateResponse("houston_rf_team.html", {"request": request})
+
+@app.get('/api/houston-site-names')
+def get_houston_site_names():
+    try:
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'csv_files', 'Houston_Sites_OSS_IP.csv')
+        df = pd.read_csv(csv_path, dtype=str, encoding='utf-8').fillna("")
+        site_names = sorted(df['Site Name'].unique())
+        return JSONResponse(site_names)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+@app.get('/api/houston-site-details')
+def get_houston_site_details(site_name: str = ""):
+    try:
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'csv_files', 'Houston_Sites_OSS_IP.csv')
+        df = pd.read_csv(csv_path, dtype=str, encoding='utf-8').fillna("")
+        filtered = df[df['Site Name'].str.strip() == site_name.strip()]
+        result = filtered[['MRBTSID', 'local Ip Address', 'OSS Name', 'oss IP address']].to_dict(orient='records')
+        return JSONResponse(result)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+def get_oracle_connection(oss_ip_address):
+    """Create Oracle database connection"""
+    try:
+        connection_string = f"pmagno7/TMobile015@{oss_ip_address}:1521/orcl"
+        connection = oracledb.connect(connection_string)
+        return connection
+    except Exception as e:
+        print(f"Oracle connection error: {e}")
+        return None
+
+@app.get('/api/fetch-alarms')
+def fetch_alarms(site_name: str = "", time_range: str = "24h", oss_ip_address: str = ""):
+    try:
+        print(site_name,time_range, oss_ip_address)
+        if not site_name or not oss_ip_address:
+            return JSONResponse({"error": "Site name and OSS IP address are required"}, status_code=400)
+        
+        # Calculate start time based on time range
+        now = datetime.now()
+        if time_range == "24h":
+            start_time = now - timedelta(hours=24)
+        elif time_range == "7d":
+            start_time = now - timedelta(days=7)
+        elif time_range == "14d":
+            start_time = now - timedelta(days=14)
+        else:
+            start_time = now - timedelta(hours=24)  # default to 24 hours
+        
+        # Format start time for Oracle
+        start_time_str = start_time.strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Create site filter with % pattern
+        site_filter = f"%{site_name}%"
+        
+        query = """
+        SELECT
+            SUBSTR(co.co_name, 2, 8) AS SiteID,
+            co.co_name AS Site_Cell,
+            co.co_dn,
+            DECODE(
+                a.SEVERITY,
+                '1', 'CRITICAL',
+                '2', 'MAJOR',
+                '3', 'MINOR',
+                'UNKNOWN'
+            ) AS ALARM_SEVERITY,
+            TO_CHAR(a.alarm_time, 'MM-DD-YYYY HH24:MI:SS') AS ALARM_TIME,
+            a.alarm_number,
+            a.alarm_status,
+            a.text,
+            a.supplementary_info
+        FROM
+            fx_alarm a
+            JOIN ctp_common_objects co ON a.ne_gid = co.co_gid
+        WHERE
+            a.alarm_number NOT IN ('9249')
+            AND a.alarm_time >= :start_time
+            AND (:site_filter IS NULL OR co.co_name LIKE :site_filter)
+        """
+        
+        # Connect to Oracle and execute query
+        connection = get_oracle_connection(oss_ip_address)
+        if not connection:
+            return JSONResponse({"error": "Failed to connect to Oracle database"}, status_code=500)
+        
+        cursor = connection.cursor()
+        cursor.execute(query, {
+            'start_time': start_time_str,
+            'site_filter': site_filter
+        })
+        
+        # Fetch results
+        columns = [col[0] for col in cursor.description]
+        results = []
+        for row in cursor.fetchall():
+            results.append(dict(zip(columns, row)))
+        
+        cursor.close()
+        connection.close()
+        
+        return JSONResponse(results)
+        
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,0 +1,1065 @@
+/* Houston RF Team Styles - T-Mobile Magenta Theme */
+:root {
+    --tmobile-magenta: #e20074;
+    --tmobile-magenta-dark: #c10062;
+    --tmobile-magenta-light: #f8e6f0;
+    --tmobile-dark: #1a1a1a;
+    --tmobile-light: #f8f9fa;
+    --success-green: #28a745;
+    --warning-orange: #ffc107;
+    --danger-red: #dc3545;
+    --excellent-blue: #007bff;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --background-light: #f8f9fa;
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --shadow-light: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-heavy: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Roboto', Arial, sans-serif;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Hero Section - Magenta Theme */
+.hero-section {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--tmobile-magenta) 0%, #c10062 50%, #a80052 100%);
+}
+
+.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+    max-width: 1200px;
+    padding: 0 20px;
+}
+
+.navigation {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 12px 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.hero-text h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 40px;
+    opacity: 0.9;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 30px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.stat-item {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 25px;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Section Headers */
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+    padding: 0 20px;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.section-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Leadership Section */
+.leadership-section {
+    padding: 100px 20px;
+    background: white;
+}
+
+.leadership-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.leader-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.leader-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--tmobile-magenta), var(--tmobile-magenta-dark));
+}
+
+.leader-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(226, 0, 116, 0.15);
+    border-color: var(--tmobile-magenta);
+}
+
+.leader-card.senior::before {
+    background: linear-gradient(90deg, var(--tmobile-magenta), #c10062);
+}
+
+.leader-card.manager::before {
+    background: linear-gradient(90deg, var(--tmobile-magenta), #a80052);
+}
+
+.leader-avatar {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+/* Photo Provisions - Avatar Container */
+.avatar-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.team-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-container:hover .team-photo {
+    transform: scale(1.05);
+}
+
+.avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--tmobile-magenta), var(--tmobile-magenta-dark));
+    border-radius: 50%;
+    display: none; /* Hidden by default, shows when photo fails to load */
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+}
+
+.status-indicator {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid white;
+}
+
+.status-indicator.online {
+    background: #10b981;
+}
+
+.leader-info h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.leader-title {
+    font-size: 1.1rem;
+    color: var(--tmobile-magenta);
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.leader-bio {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.7;
+}
+
+.leader-expertise {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.expertise-tag {
+    background: var(--tmobile-magenta-light);
+    color: var(--tmobile-magenta);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.leader-contact {
+    display: flex;
+    gap: 12px;
+}
+
+.contact-link {
+    width: 40px;
+    height: 40px;
+    background: var(--tmobile-magenta-light);
+    color: var(--tmobile-magenta);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-link:hover {
+    background: var(--tmobile-magenta);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(226, 0, 116, 0.3);
+}
+
+/* Engineering Team Section */
+.engineering-section {
+    padding: 100px 20px;
+    background: var(--background-light);
+}
+
+.engineering-section.rf-engineers {
+    background: white;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.engineer-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: var(--shadow-light);
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.engineer-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(226, 0, 116, 0.1);
+    border-color: var(--tmobile-magenta);
+}
+
+.engineer-avatar {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.engineer-avatar .avatar-container {
+    width: 60px;
+    height: 60px;
+}
+
+.engineer-avatar .avatar-placeholder {
+    width: 60px;
+    height: 60px;
+    font-size: 1.4rem;
+    background: linear-gradient(135deg, var(--tmobile-magenta), var(--tmobile-magenta-dark));
+}
+
+.experience-badge {
+    position: absolute;
+    top: 24px;
+    left: 100px;
+    z-index: 2;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-left: 0;
+}
+
+.senior-engineer .experience-badge {
+    background: var(--tmobile-magenta-dark);
+}
+
+.mid-engineer .experience-badge {
+    background: var(--tmobile-magenta);
+}
+
+.engineer-info h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.engineer-title {
+    font-size: 1rem;
+    color: var(--tmobile-magenta);
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.engineer-bio {
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+    line-height: 1.6;
+    font-size: 0.9rem;
+}
+
+.engineer-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.skill-tag {
+    background: var(--tmobile-magenta-light);
+    color: var(--tmobile-magenta);
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Values Section */
+.values-section {
+    padding: 100px 20px;
+    background: var(--background-light);
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.value-card {
+    text-align: center;
+    padding: 40px 20px;
+    border-radius: 16px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-light);
+    border: 1px solid #e9ecef;
+}
+
+.value-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(226, 0, 116, 0.1);
+    border-color: var(--tmobile-magenta);
+}
+
+.value-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--tmobile-magenta), var(--tmobile-magenta-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 8px 20px rgba(226, 0, 116, 0.3);
+}
+
+.value-card h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.value-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Footer */
+.footer {
+    background: var(--tmobile-dark);
+    color: white;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.footer-content p {
+    margin-bottom: 8px;
+}
+
+.footer-content p:last-child {
+    margin-bottom: 0;
+    opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-text h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .leadership-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .values-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .navigation {
+        position: relative;
+        top: 0;
+        left: 0;
+        margin-bottom: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-text h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .values-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .leader-card,
+    .engineer-card {
+        padding: 25px;
+    }
+}
+
+/* Additional Magenta Theme Enhancements */
+.leader-card:hover .avatar-placeholder,
+.engineer-card:hover .avatar-placeholder {
+    background: linear-gradient(135deg, var(--tmobile-magenta-dark), #a80052);
+}
+
+.expertise-tag:hover,
+.skill-tag:hover {
+    background: var(--tmobile-magenta);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.value-card:hover .value-icon {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(226, 0, 116, 0.4);
+}
+
+/* Smooth transitions for all interactive elements */
+.leader-card,
+.engineer-card,
+.value-card,
+.stat-item,
+.contact-link,
+.expertise-tag,
+.skill-tag {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Place the button in a dedicated top bar --- */
+.top-bar {
+    width: 100%;
+    position: relative;
+    height: 70px;
+    background: transparent;
+    z-index: 1001;
+    display: flex;
+    align-items: flex-start;
+    padding: 20px 0 0 30px;
+}
+
+.back-to-apps {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 2000;
+    background: linear-gradient(135deg, #e20074 0%, #c10062 100%);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(226, 0, 116, 0.18);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.back-to-apps:hover {
+    background: linear-gradient(135deg, #c10062 0%, #e20074 100%);
+    box-shadow: 0 6px 20px rgba(226, 0, 116, 0.28);
+}
+
+.header {
+    margin-top: 0; /* Remove margin-top */
+    padding-top: 0;
+}
+
+/* --- Stats Section: High Contrast --- */
+.stats-section {
+    background: #fff;
+    margin: 30px 0;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #e20074 0%, #c10062 100%);
+    border-radius: 18px;
+    border: 1.5px solid rgba(255,255,255,0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+    transition: all 0.3s ease;
+}
+
+.stat-number {
+    color: #fff;
+    font-weight: 700;
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+/* Leadership Section */
+.leadership-section {
+    margin: 50px 0;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--tmobile-magenta) 0%, var(--tmobile-magenta-dark) 100%);
+    border-radius: 2px;
+}
+
+.leadership-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.leader-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(226, 0, 116, 0.1);
+}
+
+.leader-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--tmobile-magenta) 0%, var(--tmobile-magenta-dark) 100%);
+}
+
+.leader-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(226, 0, 116, 0.2);
+}
+
+.leader-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--tmobile-magenta) 0%, var(--tmobile-magenta-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto 25px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.leader-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: none; /* Hidden by default, shown when photo is available */
+}
+
+.leader-avatar.has-photo img {
+    display: block;
+}
+
+.leader-avatar.has-photo .initials {
+    display: none;
+}
+
+.leader-card:hover .leader-avatar {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(226, 0, 116, 0.3);
+}
+
+.leader-info {
+    text-align: center;
+}
+
+.leader-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.leader-role {
+    font-size: 1.1rem;
+    color: var(--tmobile-magenta);
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.leader-bio {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Engineering Team Section */
+.engineering-section {
+    margin: 50px 0;
+}
+
+.engineering-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 40px;
+}
+
+.engineer-card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(226, 0, 116, 0.1);
+}
+
+.engineer-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--tmobile-magenta) 0%, var(--tmobile-magenta-dark) 100%);
+}
+
+.engineer-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(226, 0, 116, 0.15);
+}
+
+.engineer-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--tmobile-magenta) 0%, var(--tmobile-magenta-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.engineer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: none; /* Hidden by default, shown when photo is available */
+}
+
+.engineer-avatar.has-photo img {
+    display: block;
+}
+
+.engineer-avatar.has-photo .initials {
+    display: none;
+}
+
+.engineer-card:hover .engineer-avatar {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(226, 0, 116, 0.25);
+}
+
+.engineer-info {
+    text-align: center;
+}
+
+.engineer-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.engineer-role {
+    font-size: 1rem;
+    color: var(--tmobile-magenta);
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.engineer-bio {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+/* Experience Level Badges */
+.experience-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.experience-senior {
+    background: linear-gradient(135deg, var(--excellent-blue) 0%, #0056b3 100%);
+    color: white;
+}
+
+.experience-mid {
+    background: linear-gradient(135deg, var(--success-green) 0%, #1e7e34 100%);
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header {
+        margin-top: 70px; /* Adjusted for mobile */
+        padding: 30px 20px 25px 20px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .back-to-apps {
+        top: 20px;
+        left: 20px;
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    .leadership-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .engineering-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        margin-top: 60px;
+        padding: 25px 15px 20px 15px;
+    }
+    
+    .back-to-apps {
+        top: 15px;
+        left: 15px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .engineering-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Responsive adjustment for small screens */
+@media (max-width: 600px) {
+    .experience-badge {
+        position: static;
+        display: block;
+        margin: 8px auto 0 auto;
+        left: unset;
+        top: unset;
+    }
+}
+
+.floating-banner {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+    background: rgba(255,255,255,0.95);
+    color: #e20074;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+    padding: 22px 48px 22px 32px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    z-index: 3000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(.4,2,.6,1), transform 0.5s cubic-bezier(.4,2,.6,1);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.floating-banner.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) scale(1);
+}
+
+.close-banner {
+    background: none;
+    border: none;
+    color: #e20074;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-left: 18px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.close-banner:hover {
+    color: #c10062;
+}
+
+.avatar-wrapper {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.team-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatar-placeholder {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e20074 0%, #c10062 100%);
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    display: none; /* Hidden by default, shown only if image fails */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.congrats-name {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: #e20074;
+    letter-spacing: 1px;
+    margin: 0 4px;
+} 

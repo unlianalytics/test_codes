@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Network Analyzer - RFID</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/maintenance.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/documentation_hub.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -25,52 +25,28 @@
             <p class="subtitle">Comprehensive network performance analysis and metric tools</p>
         </header>
 
-        <main class="maintenance-container">
-            <div class="maintenance-card">
-                <div class="maintenance-icon">🔧</div>
-                <h2>Under Maintenance</h2>
-                <p class="maintenance-message">
-                    We're currently working hard to bring you the Network Analyzer with performance metrics and analysis, 
-                    and MPD performance monitoring.
-                </p>
-                
-                <div class="features-preview">
-                    <h3>Coming Features:</h3>
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <span class="feature-icon">📊</span>
-                            <span class="feature-text">Site Health Checker</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">📈</span>
-                            <span class="feature-text">Major KPI Analyzer</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">🔄</span>
-                            <span class="feature-text">Network MPD Monitoring</span>
-                        </div>
-                        <div class="feature-item">
-                            <span class="feature-icon">📋</span>
-                            <span class="feature-text">Top Worst MPD sites</span>
-                        </div>
-                    </div>
+        <main class="documentation-container">
+            <section class="features-grid">
+                <a href="/alarm-checker" class="feature-card" style="text-decoration: none; color: inherit;">
+                    <span class="feature-icon">🚨</span>
+                    <h3>Alarm Checker</h3>
+                    <p>Quickly scan and analyze network alarms to identify and resolve issues before they impact service quality.</p>
+                </a>
+                <div class="feature-card">
+                    <span class="feature-icon">📡</span>
+                    <h3>MPD Monitoring</h3>
+                    <p>Monitor Magenta Performance Dashboard(MPD) on daily basis to ensure optimal network KPI performance and stability.</p>
                 </div>
-
-                <div class="progress-section">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 35%"></div>
-                    </div>
-                    <p class="progress-text">Development Progress: 35%</p>
+                <div class="feature-card">
+                    <span class="feature-icon">📈</span>
+                    <h3>Site KPI Monitoring</h3>
+                    <p>Track and visualize key performance indicators for each site, enabling proactive network optimization and reporting.</p>
                 </div>
-
-                <div class="estimated-launch">
-                    <p>Estimated Launch: <strong>Q2 2026</strong></p>
-                </div>
-            </div>
+            </section>
         </main>
 
         <footer class="footer">
-            <p>Powered by T-Mobile RF Engineering • Network Analyzer • Coming Soon</p>
+            <p>Powered by T-Mobile RF Engineering • Network Analyzer</p>
         </footer>
     </div>
 </body>

@@ -85,19 +85,35 @@ body {
 
 /* Apps Container */
 .apps-container {
-    flex: 1;
-    padding: 20px 0;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+.apps-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+
+.apps-row-center {
+    justify-content: center;
 }
 
 .apps-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 25px;
-    margin-bottom: 30px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
 /* App Cards */
 .app-card {
+    min-width: 260px;
+    max-width: 320px;
+    margin: 0 auto;
     background: var(--tmobile-white);
     border-radius: var(--border-radius);
     padding: 25px;
@@ -225,9 +241,10 @@ body {
         font-size: 2rem;
     }
     
-    .apps-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
+    .apps-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
     }
     
     .app-card {
@@ -523,5 +540,74 @@ body {
     
     .team-section, .contact-section, .hours-section, .response-info {
         padding: 12px;
+    }
+}
+
+/* Responsive: 2 columns on medium screens, 1 on small */
+@media (max-width: 1000px) {
+    .apps-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 700px) {
+    .apps-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.app-card-wide {
+    max-width: 1100px;
+    width: 100%;
+    min-width: 320px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 48px;
+    font-size: 1.3rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+    background: linear-gradient(90deg, #e20074 0%, #c10062 100%);
+    color: #fff;
+    border-radius: 18px;
+    transition: box-shadow 0.2s;
+    text-align: center;
+}
+
+.app-card-wide .card-icon {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-card-wide .card-content {
+    text-align: center;
+    width: 100%;
+}
+
+.app-card-wide .card-content h3 {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 0;
+}
+
+.app-card-wide .card-content p {
+    color: #fff;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .app-card-wide {
+        padding: 20px;
+    }
+    
+    .logo-image {
+        max-height: 60px;
     }
 } 

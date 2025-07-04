@@ -240,11 +240,11 @@ body {
 }
 
 .team-photo {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
 }
 
 .avatar-container:hover .team-photo {
@@ -758,16 +758,10 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
-    display: none; /* Hidden by default, shown when photo is available */
+    display: block; /* Show images by default */
 }
 
-.leader-avatar.has-photo img {
-    display: block;
-}
 
-.leader-avatar.has-photo .initials {
-    display: none;
-}
 
 .leader-card:hover .leader-avatar {
     transform: scale(1.05);
@@ -858,16 +852,10 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
-    display: none; /* Hidden by default, shown when photo is available */
+    display: block; /* Show images by default */
 }
 
-.engineer-avatar.has-photo img {
-    display: block;
-}
 
-.engineer-avatar.has-photo .initials {
-    display: none;
-}
 
 .engineer-card:hover .engineer-avatar {
     transform: scale(1.05);
@@ -1033,11 +1021,11 @@ body {
 }
 
 .team-photo {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    display: block !important;
 }
 
 .avatar-placeholder {

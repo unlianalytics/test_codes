@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Test</title>
+</head>
+<body>
+    <h1>Testing Team Photos</h1>
+    
+    <h2>Ahmed Almidani</h2>
+    <img src="/static/team_photos/ahmed_almidani.jpg" alt="Ahmed Almidani" style="width:100px;height:100px;border:1px solid red;">
+    
+    <h2>Senior Engineer 5 (JPEG)</h2>
+    <img src="/static/team_photos/senior_engineer_5.jpeg" alt="Senior Engineer 5" style="width:100px;height:100px;border:1px solid blue;">
+    
+    <h2>Senior Engineer 5 (JPG)</h2>
+    <img src="/static/team_photos/senior_engineer_5.jpg" alt="Senior Engineer 5" style="width:100px;height:100px;border:1px solid green;">
+    
+    <h2>Senior Manager</h2>
+    <img src="/static/team_photos/senior_manager.jpg" alt="Senior Manager" style="width:100px;height:100px;border:1px solid orange;">
+    
+    <script>
+        // Add error handling to see what's happening
+        document.querySelectorAll('img').forEach(img => {
+            img.onerror = function() {
+                console.error('Failed to load image:', this.src);
+                this.style.border = '3px solid red';
+                this.alt = 'FAILED: ' + this.src;
+            };
+            img.onload = function() {
+                console.log('Successfully loaded image:', this.src);
+                this.style.border = '3px solid green';
+            };
+        });
+    </script>
+</body>
+</html> 

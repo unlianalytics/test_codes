@@ -1380,6 +1380,23 @@ def debug_lte_csv():
 async def houston_rf_team(request: Request):
     return templates.TemplateResponse("houston_rf_team.html", {"request": request})
 
+@app.get("/test-images", response_class=HTMLResponse)
+async def test_images(request: Request):
+    with open('test_images.html', 'r') as f:
+        return HTMLResponse(content=f.read())
+
+@app.get("/debug-team-page", response_class=HTMLResponse)
+async def debug_team_page(request: Request):
+    return templates.TemplateResponse("houston_rf_team.html", {"request": request})
+
+@app.get("/debug-images", response_class=HTMLResponse)
+async def debug_images(request: Request):
+    return templates.TemplateResponse("debug_images.html", {"request": request})
+
+@app.get("/simple-team-test", response_class=HTMLResponse)
+async def simple_team_test(request: Request):
+    return templates.TemplateResponse("simple_team_test.html", {"request": request})
+
 @app.get('/api/houston-site-names')
 def get_houston_site_names():
     try:

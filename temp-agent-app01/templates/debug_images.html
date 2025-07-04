@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Images</title>
+</head>
+<body>
+    <h1>Debug Jinja2 Image URLs</h1>
+    
+    <h2>Direct Path (should work):</h2>
+    <img src="/static/team_photos/ahmed_almidani.jpg" alt="Direct" style="width:100px;height:100px;border:2px solid blue;">
+    
+    <h2>Jinja2 url_for (testing):</h2>
+    <img src="{{ url_for('static', path='team_photos/ahmed_almidani.jpg') }}" alt="Jinja2" style="width:100px;height:100px;border:2px solid red;">
+    
+    <h2>Generated URL:</h2>
+    <p>Jinja2 URL: {{ url_for('static', path='team_photos/ahmed_almidani.jpg') }}</p>
+    
+    <script>
+        document.querySelectorAll('img').forEach(img => {
+            img.onerror = function() {
+                console.error('Failed to load image:', this.src);
+                this.style.border = '3px solid red';
+                this.alt = 'FAILED: ' + this.src;
+            };
+            img.onload = function() {
+                console.log('Successfully loaded image:', this.src);
+                this.style.border = '3px solid green';
+            };
+        });
+    </script>
+</body>
+</html> 

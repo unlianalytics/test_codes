@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Houston RF Team - T-Mobile RF Engineering</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/houston_rf_team.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='houston_rf_team.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -58,11 +58,12 @@
                 <div class="leader-card senior">
                     <div class="leader-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/senior_manager.jpg') }}" 
+                            <img src="{{ url_for('static', path='team_photos/senior_manager.jpg') }}" 
                                  alt="Senior RF Manager" 
                                  class="team-photo"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="avatar-placeholder">PW</div>
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">PW</div>
                         </div>
                         <div class="status-indicator online"></div>
                     </div>
@@ -91,11 +92,12 @@
                 <div class="leader-card manager">
                     <div class="leader-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/rf_manager.jpg') }}" 
+                            <img src="{{ url_for('static', path='team_photos/rf_manager.jpg') }}" 
                                  alt="RF Manager" 
                                  class="team-photo"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="avatar-placeholder">CG</div>
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+                            <div class="avatar-placeholder" style="display: none;">CG</div>
                         </div>
                         <div class="status-indicator online"></div>
                     </div>
@@ -158,7 +160,7 @@
                 <div class="engineer-card senior-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/senior_engineer_2.jpg') }}"
+                            <img src="{{ url_for('static', path='team_photos/senior_engineer_2.jpg') }}"
                                  alt="Senior RF Engineer"
                                  class="team-photo"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
@@ -183,7 +185,7 @@
                 <div class="engineer-card senior-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/senior_engineer_3.jpg') }}"
+                            <img src="{{ url_for('static', path='team_photos/senior_engineer_3.jpg') }}"
                                  alt="Senior RF Engineer"
                                  class="team-photo"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
@@ -208,7 +210,7 @@
                 <div class="engineer-card senior-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/senior_engineer_4.jpg') }}"
+                            <img src="{{ url_for('static', path='team_photos/senior_engineer_4.jpg') }}"
                                  alt="Senior RF Engineer"
                                  class="team-photo"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
@@ -233,7 +235,11 @@
                 <div class="engineer-card senior-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/senior_engineer_5.jpeg') }}" style="width:100px;height:100px;border:2px solid red;">
+                            <img src="{{ url_for('static', path='team_photos/senior_engineer_5.jpeg') }}"
+                                 alt="Senior RF Engineer"
+                                 class="team-photo"
+                                 onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+                                 onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
                             <div class="avatar-placeholder" style="display: none;">PJM</div>
                         </div>
                         <div class="experience-badge"></div>
@@ -249,6 +255,7 @@
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -263,7 +270,7 @@
                 <div class="engineer-card mid-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_1.jpg') }}"
+                            <img src="{{ url_for('static', path='team_photos/rf_engineer_1.jpg') }}"
                                  alt="RF Engineer"
                                  class="team-photo"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
@@ -288,7 +295,7 @@
                 <div class="engineer-card mid-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_2.jpg') }}"
+                            <img src="{{ url_for('static', path='team_photos/rf_engineer_2.jpg') }}"
                                  alt="RF Engineer"
                                  class="team-photo"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
@@ -313,7 +320,7 @@
                 <div class="engineer-card mid-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_3.jpg') }}"
+                            <img src="{{ url_for('static', path='team_photos/rf_engineer_3.jpg') }}"
                                  alt="RF Engineer"
                                  class="team-photo"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
@@ -338,7 +345,7 @@
                 <div class="engineer-card mid-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_4.jpg') }}"
+                            <img src="{{ url_for('static', path='team_photos/rf_engineer_4.jpg') }}"
                                  alt="RF Engineer"
                                  class="team-photo"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
@@ -363,7 +370,7 @@
                 <div class="engineer-card mid-engineer">
                     <div class="engineer-avatar">
                         <div class="avatar-wrapper">
-                            <img src="{{ url_for('static', path='/team_photos/rf_engineer_5.jpg') }}"
+                            <img src="{{ url_for('static', path='team_photos/rf_engineer_5.jpg') }}"
                                  alt="RF Engineer"
                                  class="team-photo"
                                  onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
@@ -433,9 +440,21 @@
         </footer>
     </div>
 
-    <script src="{{ url_for('static', path='/houston_rf_team.js') }}"></script>
+    <script src="{{ url_for('static', path='houston_rf_team.js') }}"></script>
     <script>
     window.addEventListener('DOMContentLoaded', function() {
+        // Debug image loading
+        console.log('[Debug] Checking team photos...');
+        document.querySelectorAll('.team-photo').forEach((img, index) => {
+            console.log(`[Debug] Image ${index + 1}:`, img.src);
+            img.onload = function() {
+                console.log(`[Debug] Image ${index + 1} loaded successfully:`, this.src);
+            };
+            img.onerror = function() {
+                console.error(`[Debug] Image ${index + 1} failed to load:`, this.src);
+            };
+        });
+        
         setTimeout(function() {
             document.getElementById('congrats-banner').classList.add('show');
         }, 800);

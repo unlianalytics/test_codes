@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Team Test</title>
+    <style>
+        .avatar-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .team-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+        }
+        .avatar-placeholder {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e20074 0%, #c10062 100%);
+            color: #fff;
+            font-size: 2rem;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Team Test</h1>
+    
+    <h2>Ahmed Almidani</h2>
+    <div class="avatar-wrapper">
+        <img src="{{ url_for('static', path='team_photos/ahmed_almidani.jpg') }}"
+             alt="Ahmed Almidani"
+             class="team-photo"
+             onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+             onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+        <div class="avatar-placeholder" style="display: none;">AA</div>
+    </div>
+    
+    <h2>Senior Manager</h2>
+    <div class="avatar-wrapper">
+        <img src="{{ url_for('static', path='team_photos/senior_manager.jpg') }}"
+             alt="Senior Manager"
+             class="team-photo"
+             onerror="this.style.display='none'; this.parentNode.querySelector('.avatar-placeholder').style.display='flex';"
+             onload="this.parentNode.querySelector('.avatar-placeholder').style.display='none';">
+        <div class="avatar-placeholder" style="display: none;">PW</div>
+    </div>
+    
+    <script>
+        console.log('[Simple Test] Checking images...');
+        document.querySelectorAll('.team-photo').forEach((img, index) => {
+            console.log(`[Simple Test] Image ${index + 1}:`, img.src);
+            img.onload = function() {
+                console.log(`[Simple Test] Image ${index + 1} loaded successfully:`, this.src);
+            };
+            img.onerror = function() {
+                console.error(`[Simple Test] Image ${index + 1} failed to load:`, this.src);
+            };
+        });
+    </script>
+</body>
+</html> 

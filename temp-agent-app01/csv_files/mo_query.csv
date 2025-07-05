@@ -1,0 +1,6 @@
+managed_object,query_description,sql_query
+"LTE_RSRP","LTE RSRP Parameters","SELECT site_name, parameter_name, parameter_value, timestamp FROM lte_rsrp_table WHERE site_name = :site_name"
+"LTE_RSRQ","LTE RSRQ Parameters","SELECT site_name, parameter_name, parameter_value, timestamp FROM lte_rsrq_table WHERE site_name = :site_name"
+"LTE_SINR","LTE SINR Parameters","SELECT site_name, parameter_name, parameter_value, timestamp FROM lte_sinr_table WHERE site_name = :site_name"
+"NR_RSRP","NR RSRP Parameters","SELECT site_name, parameter_name, parameter_value, timestamp FROM nr_rsrp_table WHERE site_name = :site_name"
+"NR_RSRQ","NR RSRQ Parameters","SELECT site_name, parameter_name, parameter_value, timestamp FROM nr_rsrq_table WHERE site_name = :site_name" 

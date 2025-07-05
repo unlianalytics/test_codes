@@ -27,6 +27,7 @@ import time
 import logging
 import threading
 import oracledb
+import csv
 
 warnings.filterwarnings('ignore')
 
@@ -806,7 +807,7 @@ async def chat(message: str = Form(...)):
         
         # Send message to OpenAI
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             max_tokens=1500,  # Increased for more detailed responses
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -835,7 +836,7 @@ async def chat(message: str = Form(...)):
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "model": "OpenAI GPT-4 (Enhanced RAG)", "timestamp": datetime.now().isoformat()}
+    return {"status": "healthy", "model": "OpenAI GPT-4o (Enhanced RAG)", "timestamp": datetime.now().isoformat()}
 
 @app.get("/knowledge-status")
 async def knowledge_status():
@@ -1252,7 +1253,7 @@ async def simple_chat(message: str = Form(...)):
         You can help with general RF engineering questions and network optimization concepts."""
         
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             max_tokens=500,
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -1397,6 +1398,10 @@ async def debug_images(request: Request):
 async def simple_team_test(request: Request):
     return templates.TemplateResponse("simple_team_test.html", {"request": request})
 
+@app.get("/parameter-query", response_class=HTMLResponse)
+async def parameter_query(request: Request):
+    return templates.TemplateResponse("parameter_query.html", {"request": request})
+
 @app.get('/api/houston-site-names')
 def get_houston_site_names():
     try:
@@ -1502,6 +1507,123 @@ def fetch_alarms(site_name: str = "", time_range: str = "24h", oss_ip_address: s
         
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
+
+# Parameter Query API Endpoints - Independent from Alarm Checker
+@app.get('/api/parameter-site-names')
+def get_parameter_site_names():
+    """Get site names for Parameter Query (uses same CSV as Alarm Checker)"""
+    try:
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "csv_files", "Houston_Sites_OSS_IP.csv")
+        if not os.path.exists(csv_path):
+            return {"success": False, "error": "Site CSV file not found", "sites": []}
+        
+        sites = []
+        with open(csv_path, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row.get('Site Name') and row.get('oss IP address'):
+                    sites.append({
+                        'site_name': row['Site Name'].strip(),
+                        'oss_ip_address': row['oss IP address'].strip()
+                    })
+        
+        logger.info(f"Parameter Query: Loaded {len(sites)} sites from CSV")
+        return {"success": True, "sites": sites}
+    except Exception as e:
+        logger.error(f"Parameter Query: Error loading site names: {e}")
+        return {"success": False, "error": str(e), "sites": []}
+
+@app.get('/api/parameter-managed-objects')
+def get_parameter_managed_objects():
+    """Get managed objects from the CSV mapping file"""
+    try:
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "csv_files", "mo_query.csv")
+        if not os.path.exists(csv_path):
+            return {"success": False, "error": "Managed Object CSV file not found", "managed_objects": []}
+        
+        managed_objects = []
+        with open(csv_path, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row.get('managed_object') and row.get('sql_query'):
+                    managed_objects.append({
+                        'managed_object': row['managed_object'].strip(),
+                        'query_description': row.get('query_description', '').strip(),
+                        'sql_query': row['sql_query'].strip()
+                    })
+        
+        logger.info(f"Parameter Query: Loaded {len(managed_objects)} managed objects from CSV")
+        return {"success": True, "managed_objects": managed_objects}
+    except Exception as e:
+        logger.error(f"Parameter Query: Error loading managed objects: {e}")
+        return {"success": False, "error": str(e), "managed_objects": []}
+
+@app.post('/api/fetch-parameter-data')
+async def fetch_parameter_data(request: Request):
+    """Fetch parameter data from Oracle based on managed object selection"""
+    try:
+        body = await request.json()
+        site_name = body.get('site_name', '')
+        managed_object = body.get('managed_object', '')
+        oss_ip_address = body.get('oss_ip_address', '')
+        
+        if not site_name or not managed_object or not oss_ip_address:
+            return {"success": False, "error": "Missing required parameters"}
+        
+        # Get the SQL query for the selected managed object
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "csv_files", "mo_query.csv")
+        if not os.path.exists(csv_path):
+            return {"success": False, "error": "Managed Object CSV file not found"}
+        
+        sql_query = None
+        with open(csv_path, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row.get('managed_object', '').strip() == managed_object:
+                    sql_query = row.get('sql_query', '').strip()
+                    break
+        
+        if not sql_query:
+            return {"success": False, "error": f"No SQL query found for managed object: {managed_object}"}
+        
+        # Execute the query with the site name parameter
+        try:
+            connection = get_oracle_connection(oss_ip_address)
+            if not connection:
+                return {"success": False, "error": "Failed to connect to Oracle database"}
+            
+            cursor = connection.cursor()
+            
+            # Replace :site_name placeholder with actual site name
+            sql_query = sql_query.replace(':site_name', f"'{site_name}'")
+            
+            logger.info(f"Parameter Query: Executing query for {managed_object} at {site_name}")
+            cursor.execute(sql_query)
+            
+            # Get column names
+            columns = [desc[0] for desc in cursor.description]
+            
+            # Fetch all rows
+            rows = cursor.fetchall()
+            
+            # Convert to list of dictionaries
+            data = []
+            for row in rows:
+                data.append(dict(zip(columns, row)))
+            
+            cursor.close()
+            connection.close()
+            
+            logger.info(f"Parameter Query: Retrieved {len(data)} records for {managed_object}")
+            return {"success": True, "data": data}
+            
+        except Exception as db_error:
+            logger.error(f"Parameter Query: Database error: {db_error}")
+            return {"success": False, "error": f"Database error: {str(db_error)}"}
+            
+    except Exception as e:
+        logger.error(f"Parameter Query: Error fetching parameter data: {e}")
+        return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

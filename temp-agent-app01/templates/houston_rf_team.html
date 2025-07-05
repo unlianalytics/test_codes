@@ -9,10 +9,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Floating Congratulatory Banner -->
+    <!-- Modern Floating Congratulatory Banner -->
     <div id="congrats-banner" class="floating-banner">
-        🎉 Congratulations, <span class="congrats-name">Ahmed Almidani</span>! Outstanding performance this quarter! 🎉
-        <button class="close-banner" onclick="document.getElementById('congrats-banner').classList.remove('show');">&times;</button>
+        <div class="banner-content">
+            <div class="banner-icon">
+                <div class="trophy-icon">🏆</div>
+                <div class="sparkle sparkle-1">✨</div>
+                <div class="sparkle sparkle-2">✨</div>
+                <div class="sparkle sparkle-3">✨</div>
+            </div>
+            <div class="banner-text">
+                <div class="banner-title">Outstanding Achievement!</div>
+                <div class="banner-message">
+                    Congratulations, <span class="congrats-name">Ahmed Almidani</span>! 
+                    <span class="banner-highlight">Exceptional performance</span> this quarter!
+                </div>
+            </div>
+            <button class="close-banner" onclick="closeBanner()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+        <div class="banner-progress"></div>
     </div>
     <button class="back-to-apps" onclick="window.location.href='/'">&larr; Back to Apps</button>
     <div class="container">
@@ -434,8 +453,8 @@
         <!-- Footer -->
         <footer class="footer">
             <div class="footer-content">
-                <p>&copy; 2024 T-Mobile RF Engineering - Houston Team</p>
-                <p>Excellence in Radio Frequency Engineering</p>
+                <p>&copy; 2025 T-Mobile RF Engineering - Houston Team</p>
+                <p>Excellence in Radio Frequency Engineering - Network Design and Performance Optimization</p>
             </div>
         </footer>
     </div>

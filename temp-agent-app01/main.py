@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form, BackgroundTasks
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import anthropic
@@ -14,7 +14,7 @@ from typing import List, Dict, Set
 import re
 import glob
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 import warnings
 import hashlib
 import pickle
@@ -22,6 +22,8 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import time
+import csv
+import oracledb
 warnings.filterwarnings('ignore')
 
 # Load environment variables
@@ -75,7 +77,7 @@ def generate_embeddings(texts: List[str]) -> List[List[float]]:
         return []
 
 # Initialize sentence transformer for embeddings
-EMBEDDING_MODEL = " text-embedding-ada-002\('all-MiniLM-L6-v2')
+EMBEDDING_MODEL = "text-embedding-ada-002"
 # embedding_model.save(r'C:\Users\magno\unliAnalytics')
 
 
@@ -772,6 +774,121 @@ async def troubleshooting_guide(request: Request):
 async def documentation_hub(request: Request):
     """Documentation Hub maintenance page"""
     return templates.TemplateResponse("documentation_hub.html", {"request": request})
+
+@app.get("/parameter-query", response_class=HTMLResponse)
+async def parameter_query(request: Request):
+    """Parameter Query page"""
+    return templates.TemplateResponse("parameter_query.html", {"request": request})
+
+# Parameter Query API Endpoints
+@app.get('/api/parameter-site-names')
+def get_parameter_site_names():
+    """Get site names for Parameter Query (uses same CSV as Alarm Checker)"""
+    try:
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "csv_files", "Houston_Sites_OSS_IP.csv")
+        if not os.path.exists(csv_path):
+            return {"success": False, "error": "Site CSV file not found", "sites": []}
+        
+        sites = []
+        with open(csv_path, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row.get('Site Name') and row.get('oss IP address'):
+                    sites.append({
+                        'site_name': row['Site Name'].strip(),
+                        'oss_ip_address': row['oss IP address'].strip()
+                    })
+        
+        return {"success": True, "sites": sites}
+    except Exception as e:
+        return {"success": False, "error": str(e), "sites": []}
+
+@app.get('/api/parameter-managed-objects')
+def get_parameter_managed_objects():
+    """Get managed objects from the CSV mapping file"""
+    try:
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "csv_files", "mo_query.csv")
+        if not os.path.exists(csv_path):
+            return {"success": False, "error": "Managed Object CSV file not found", "managed_objects": []}
+        
+        managed_objects = []
+        with open(csv_path, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row.get('managed_object') and row.get('sql_query'):
+                    managed_objects.append({
+                        'managed_object': row['managed_object'].strip(),
+                        'query_description': row.get('query_description', '').strip(),
+                        'sql_query': row['sql_query'].strip()
+                    })
+        
+        return {"success": True, "managed_objects": managed_objects}
+    except Exception as e:
+        return {"success": False, "error": str(e), "managed_objects": []}
+
+def get_oracle_connection(oss_ip_address):
+    """Create Oracle database connection"""
+    try:
+        connection_string = f"pmagno7/TMobile015@{oss_ip_address}:1521/orcl"
+        connection = oracledb.connect(connection_string)
+        return connection
+    except Exception as e:
+        print(f"Oracle connection error: {e}")
+        return None
+
+@app.post('/api/fetch-parameter-data')
+async def fetch_parameter_data(request: Request):
+    """Fetch parameter data from Oracle based on managed object selection"""
+    try:
+        body = await request.json()
+        site_name = body.get('site_name', '')
+        managed_object = body.get('managed_object', '')
+        oss_ip_address = body.get('oss_ip_address', '')
+        
+        if not site_name or not managed_object or not oss_ip_address:
+            return {"success": False, "error": "Missing required parameters"}
+        
+        # Get the SQL query for the selected managed object
+        csv_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "csv_files", "mo_query.csv")
+        if not os.path.exists(csv_path):
+            return {"success": False, "error": "Managed Object CSV file not found"}
+        
+        sql_query = None
+        with open(csv_path, 'r', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                if row.get('managed_object', '').strip() == managed_object:
+                    sql_query = row.get('sql_query', '').strip()
+                    break
+        
+        if not sql_query:
+            return {"success": False, "error": f"No SQL query found for managed object: {managed_object}"}
+        
+        # Execute the query with the site name parameter
+        try:
+            connection = get_oracle_connection(oss_ip_address)
+            if not connection:
+                return {"success": False, "error": "Failed to connect to Oracle database"}
+            
+            cursor = connection.cursor()
+            cursor.execute(sql_query, {'site_name': site_name})
+            
+            # Fetch results
+            columns = [col[0] for col in cursor.description]
+            results = []
+            for row in cursor.fetchall():
+                results.append(dict(zip(columns, row)))
+            
+            cursor.close()
+            connection.close()
+            
+            return {"success": True, "data": results}
+            
+        except Exception as e:
+            return {"success": False, "error": f"Database query error: {str(e)}"}
+        
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

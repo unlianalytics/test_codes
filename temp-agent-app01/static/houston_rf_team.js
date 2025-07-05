@@ -120,4 +120,31 @@ document.addEventListener('DOMContentLoaded', function() {
     document.head.appendChild(style);
     
     console.log('[Houston RF Team] Initialization complete!');
+});
+
+// Modern banner close function with smooth animation
+function closeBanner() {
+    const banner = document.getElementById('congrats-banner');
+    if (banner) {
+        // Add exit animation
+        banner.style.transform = 'translateX(-50%) translateY(-100px) scale(0.8)';
+        banner.style.opacity = '0';
+        
+        // Remove show class after animation
+        setTimeout(() => {
+            banner.classList.remove('show');
+            banner.style.transform = '';
+            banner.style.opacity = '';
+        }, 600);
+    }
+}
+
+// Auto-show banner after page load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        const banner = document.getElementById('congrats-banner');
+        if (banner) {
+            banner.classList.add('show');
+        }
+    }, 1000);
 }); 

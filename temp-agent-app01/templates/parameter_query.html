@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parameter Query - T-Mobile RF Engineering</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='parameter_query.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <button class="back-button" onclick="window.location.href='/'">
+                <i class="fas fa-arrow-left"></i> Back to Apps
+            </button>
+            <h1>Parameter Query System</h1>
+            <p>Query and analyze network parameters from Oracle database by area</p>
+        </header>
+
+        <main class="documentation-container">
+            <div class="parameter-flex-row">
+                <div class="parameter-left">
+                    <!-- Area Tabs -->
+                    <div class="tabs">
+                        <button class="tab-button active" onclick="showTab('houston')">Houston</button>
+                        <button class="tab-button" onclick="showTab('dallas')">Dallas</button>
+                        <button class="tab-button" onclick="showTab('austin')">Austin</button>
+                        <button class="tab-button" onclick="showTab('area-x')">Area X</button>
+                    </div>
+
+                    <!-- Houston Tab Content -->
+                    <div id="houston" class="tab-content active">
+                        <h2>Houston Parameter Query</h2>
+                        <div class="parameter-controls">
+                            <div class="control-group">
+                                <label for="site-input" style="font-weight:600;">Select Site Name:</label>
+                                <div style="position: relative; display: inline-block;">
+                                    <input id="site-input" type="text" placeholder="Type to search site..." autocomplete="off" style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px;">
+                                    <ul id="site-autocomplete" class="autocomplete-list" style="list-style:none; margin:0; padding:0; position:absolute; background:#fff; border:1.5px solid #e20074; border-radius:0 0 8px 8px; max-height:200px; overflow-y:auto; width:260px; z-index:1000; display:none;"></ul>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="managed-object-select" style="font-weight:600;">Managed Object:</label>
+                                <select id="managed-object-select" style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px; background: #fff;">
+                                    <option value="">Select a managed object...</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="oss-ip-input" style="font-weight:600;">OSS IP Address:</label>
+                                <input type="text" id="oss-ip-input" readonly style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px; background: #f8f9fa;">
+                            </div>
+
+                            <div class="control-group">
+                                <button id="fetch-parameter-btn" onclick="fetchParameterData()" style="margin: 16px 0 0 0; padding: 12px 24px; background: linear-gradient(90deg, #e20074 0%, #6a1b9a 100%); color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                                    <i class="fas fa-search"></i> Fetch Parameter Data
+                                </button>
+                            </div>
+                        </div>
+                        <p>Parameter query and analysis for Houston area.</p>
+                    </div>
+
+                    <!-- Dallas Tab Content -->
+                    <div id="dallas" class="tab-content">
+                        <h2>Dallas Parameter Query</h2>
+                        <div class="parameter-controls">
+                            <div class="control-group">
+                                <label for="site-input" style="font-weight:600;">Select Site Name:</label>
+                                <div style="position: relative; display: inline-block;">
+                                    <input id="site-input" type="text" placeholder="Type to search site..." autocomplete="off" style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px;">
+                                    <ul id="site-autocomplete" class="autocomplete-list" style="list-style:none; margin:0; padding:0; position:absolute; background:#fff; border:1.5px solid #e20074; border-radius:0 0 8px 8px; max-height:200px; overflow-y:auto; width:260px; z-index:1000; display:none;"></ul>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="managed-object-select" style="font-weight:600;">Managed Object:</label>
+                                <select id="managed-object-select" style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px; background: #fff;">
+                                    <option value="">Select a managed object...</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="oss-ip-input" style="font-weight:600;">OSS IP Address:</label>
+                                <input type="text" id="oss-ip-input" readonly style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px; background: #f8f9fa;">
+                            </div>
+
+                            <div class="control-group">
+                                <button id="fetch-parameter-btn" onclick="fetchParameterData()" style="margin: 16px 0 0 0; padding: 12px 24px; background: linear-gradient(90deg, #e20074 0%, #6a1b9a 100%); color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                                    <i class="fas fa-search"></i> Fetch Parameter Data
+                                </button>
+                            </div>
+                        </div>
+                        <p>Parameter query and analysis for Dallas area.</p>
+                    </div>
+
+                    <!-- Austin Tab Content -->
+                    <div id="austin" class="tab-content">
+                        <h2>Austin Parameter Query</h2>
+                        <div class="parameter-controls">
+                            <div class="control-group">
+                                <label for="site-input" style="font-weight:600;">Select Site Name:</label>
+                                <div style="position: relative; display: inline-block;">
+                                    <input id="site-input" type="text" placeholder="Type to search site..." autocomplete="off" style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px;">
+                                    <ul id="site-autocomplete" class="autocomplete-list" style="list-style:none; margin:0; padding:0; position:absolute; background:#fff; border:1.5px solid #e20074; border-radius:0 0 8px 8px; max-height:200px; overflow-y:auto; width:260px; z-index:1000; display:none;"></ul>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="managed-object-select" style="font-weight:600;">Managed Object:</label>
+                                <select id="managed-object-select" style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px; background: #fff;">
+                                    <option value="">Select a managed object...</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="oss-ip-input" style="font-weight:600;">OSS IP Address:</label>
+                                <input type="text" id="oss-ip-input" readonly style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px; background: #f8f9fa;">
+                            </div>
+
+                            <div class="control-group">
+                                <button id="fetch-parameter-btn" onclick="fetchParameterData()" style="margin: 16px 0 0 0; padding: 12px 24px; background: linear-gradient(90deg, #e20074 0%, #6a1b9a 100%); color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                                    <i class="fas fa-search"></i> Fetch Parameter Data
+                                </button>
+                            </div>
+                        </div>
+                        <p>Parameter query and analysis for Austin area.</p>
+                    </div>
+
+                    <!-- Area X Tab Content -->
+                    <div id="area-x" class="tab-content">
+                        <h2>Area X Parameter Query</h2>
+                        <div class="parameter-controls">
+                            <div class="control-group">
+                                <label for="site-input" style="font-weight:600;">Select Site Name:</label>
+                                <div style="position: relative; display: inline-block;">
+                                    <input id="site-input" type="text" placeholder="Type to search site..." autocomplete="off" style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px;">
+                                    <ul id="site-autocomplete" class="autocomplete-list" style="list-style:none; margin:0; padding:0; position:absolute; background:#fff; border:1.5px solid #e20074; border-radius:0 0 8px 8px; max-height:200px; overflow-y:auto; width:260px; z-index:1000; display:none;"></ul>
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="managed-object-select" style="font-weight:600;">Managed Object:</label>
+                                <select id="managed-object-select" style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px; background: #fff;">
+                                    <option value="">Select a managed object...</option>
+                                </select>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="oss-ip-input" style="font-weight:600;">OSS IP Address:</label>
+                                <input type="text" id="oss-ip-input" readonly style="margin: 16px 0 0 0; padding: 10px 18px; border-radius: 8px; border: 1.5px solid #e20074; font-size: 1.1rem; min-width: 220px; background: #f8f9fa;">
+                            </div>
+
+                            <div class="control-group">
+                                <button id="fetch-parameter-btn" onclick="fetchParameterData()" style="margin: 16px 0 0 0; padding: 12px 24px; background: linear-gradient(90deg, #e20074 0%, #6a1b9a 100%); color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                                    <i class="fas fa-search"></i> Fetch Parameter Data
+                                </button>
+                            </div>
+                        </div>
+                        <p>Parameter query and analysis for Area X (future area).</p>
+                    </div>
+                </div>
+
+                <div class="parameter-right">
+                    <div id="parameter-results-section" style="margin-top: 40px; display: none;">
+                        <h3 style="color: #e20074; margin-bottom: 20px;">Parameter Query Results</h3>
+                        <div id="parameter-results-container"></div>
+                        <div id="parameter-download-section" style="margin-top: 20px; text-align: center;">
+                            <button id="download-csv-btn" onclick="downloadParameterCSV()" style="padding: 12px 24px; background: linear-gradient(90deg, #e20074 0%, #6a1b9a 100%); color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: 600; transition: all 0.3s ease;">
+                                <i class="fas fa-download"></i> Download CSV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="error-section" id="errorSection" style="display: none;">
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error</h3>
+                <p id="errorMessage"></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='parameter_query.js') }}"></script>
+</body>
+</html> 
